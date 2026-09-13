@@ -49,8 +49,8 @@ jobs:
           mkdir -p BabyFileCab.AppDir/usr/share/icons/hicolor/256x256/apps
 
           cp -R dist/BabyFileCab/* BabyFileCab.AppDir/usr/bin/
-          cp assets/BabyFileCab.png BabyFileCab.AppDir/usr/share/icons/hicolor/256x256/apps/babyfilecab.png
-          cp assets/BabyFileCab.png BabyFileCab.AppDir/babyfilecab.png
+          cp assets/babyfilecab.png BabyFileCab.AppDir/usr/share/icons/hicolor/256x256/apps/babyfilecab.png
+          cp assets/babyfilecab.png BabyFileCab.AppDir/babyfilecab.png
 
           cat > BabyFileCab.AppDir/BabyFileCab.desktop <<'EOF'
           [Desktop Entry]
