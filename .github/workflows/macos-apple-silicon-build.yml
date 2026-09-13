@@ -1,0 +1,108 @@
+name: Build BabyFileCab for Apple Silicon
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-apple-silicon:
+    runs-on: macos-15
+
+    steps:
+      - name: Check out BabyFileCab
+        uses: actions/checkout@v7
+
+      - name: Confirm Apple Silicon runner
+        run: |
+          echo "Runner architecture:"
+          uname -m
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Confirm Python architecture
+        run: |
+          python -c "import platform; print('Python architecture:', platform.machine())"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install BabyFileCab dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
+
+      - name: Check required imports
+        run: |
+          python -c "import tkinter; print('Tkinter OK:', tkinter.TkVersion)"
+          python -c "import pypdfium2, pypdf, PIL, openpyxl, reportlab, docx, cryptography, argon2; print('BabyFileCab dependencies OK')"
+
+      - name: Check BabyFileCab syntax
+        run: python -m py_compile babyfilecab.py
+
+      - name: Create macOS icon
+        run: |
+          rm -rf BabyFileCab.iconset
+          mkdir BabyFileCab.iconset
+
+          sips -z 16 16 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_16x16.png
+          sips -z 32 32 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_16x16@2x.png
+          sips -z 32 32 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_32x32.png
+          sips -z 64 64 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_32x32@2x.png
+          sips -z 128 128 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_128x128.png
+          sips -z 256 256 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_128x128@2x.png
+          sips -z 256 256 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_256x256.png
+          sips -z 512 512 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_256x256@2x.png
+          sips -z 512 512 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_512x512.png
+          sips -z 1024 1024 assets/BabyFileCab.png --out BabyFileCab.iconset/icon_512x512@2x.png
+
+          iconutil -c icns BabyFileCab.iconset -o assets/BabyFileCab.icns
+
+      - name: Build BabyFileCab.app for Apple Silicon
+        run: |
+          python -m PyInstaller \
+            --noconfirm \
+            --clean \
+            --windowed \
+            --onedir \
+            --name BabyFileCab \
+            --icon assets/BabyFileCab.icns \
+            --osx-bundle-identifier com.babyfilecab.app \
+            --target-arch arm64 \
+            --collect-all pypdfium2 \
+            babyfilecab.py
+
+      - name: Verify Apple Silicon build
+        run: |
+          test -d dist/BabyFileCab.app
+          echo "Executable:"
+          file dist/BabyFileCab.app/Contents/MacOS/BabyFileCab
+          echo "Architectures:"
+          lipo -archs dist/BabyFileCab.app/Contents/MacOS/BabyFileCab
+
+      - name: Create Apple Silicon DMG
+        run: |
+          rm -rf dmg-root
+          mkdir dmg-root
+          cp -R dist/BabyFileCab.app dmg-root/BabyFileCab.app
+          ln -s /Applications dmg-root/Applications
+
+          hdiutil create \
+            -volname "BabyFileCab" \
+            -srcfolder dmg-root \
+            -ov \
+            -format UDZO \
+            BabyFileCab-macOS-Apple-Silicon.dmg
+
+      - name: Verify DMG
+        run: |
+          ls -lh BabyFileCab-macOS-Apple-Silicon.dmg
+          shasum -a 256 BabyFileCab-macOS-Apple-Silicon.dmg
+
+      - name: Upload Apple Silicon DMG
+        uses: actions/upload-artifact@v7
+        with:
+          name: BabyFileCab-macOS-Apple-Silicon
+          path: BabyFileCab-macOS-Apple-Silicon.dmg
+          if-no-files-found: error
