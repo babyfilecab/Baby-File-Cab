@@ -1,0 +1,23 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const source = fs.readFileSync(path.join(__dirname, '../dist/app.js'), 'utf8');
+const chunk = source.slice(source.indexOf('function hideChangePassword()'), source.indexOf('function wireEvents()'));
+(async () => {
+ const nodes = {};
+ for (const id of ['changePasswordBackdrop','changeCurrentPassword','changeNewPassword','changeConfirmPassword','changePasswordSave']) nodes[id] = {value:'',disabled:false,classList:{add(){}}};
+ let calls=[],notices=[],errors=[],pending;
+ const box={$:id=>nodes[id],sessionGeneration:1,hideAllPasswords(){},toast:v=>notices.push(v),showError:e=>errors.push(e),backend:()=>({ChangePassword:async(...args)=>{calls.push(args);if(pending)await pending;}})};
+ vm.createContext(box);vm.runInContext(chunk,box);
+ nodes.changeCurrentPassword.value='old-password';
+ nodes.changeNewPassword.value=nodes.changeConfirmPassword.value='new-password';
+ await box.changePassword();
+ assert.deepEqual(calls[0],['old-password','new-password','new-password']);
+ assert.equal(nodes.changeCurrentPassword.value,'');assert.equal(nodes.changeNewPassword.value,'');assert.equal(notices.length,1);
+ let resolve;pending=new Promise(r=>resolve=r);
+ const saving=box.changePassword();await box.changePassword();assert.equal(calls.length,2);
+ box.sessionGeneration++;resolve();await saving;assert.equal(notices.length,1);assert.equal(nodes.changePasswordSave.disabled,false);
+ pending=null;box.backend=()=>({ChangePassword:async()=>{throw Error('wrong password');}});
+ await box.changePassword();assert.equal(errors.length,1);assert.equal(nodes.changePasswordSave.disabled,false);
+})().catch(e=>{console.error(e);process.exitCode=1;});

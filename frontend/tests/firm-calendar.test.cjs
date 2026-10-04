@@ -1,0 +1,8 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const vm=require('node:vm');
+const source=fs.readFileSync(path.join(__dirname,'../dist/app.js'),'utf8');const start=source.indexOf('function firmCalendarStatusLabel');const end=source.indexOf('function renderFirmCalendarSearch',start);const box={};vm.createContext(box);vm.runInContext(source.slice(start,end),box);
+const items=[{date:'2026-12-14',clientName:'Alice Smith',clientId:'1'},{date:'2026-01-01',clientName:'ALICE Jones',clientId:'2'},{date:'2026-06-01',clientName:'Bob',clientId:'3'}];
+const found=box.searchFirmCalendarAssignments(items,' alice ');assert.equal(found.length,2);assert.equal(found[0].clientId,'2');assert.equal(found[1].clientId,'1');assert.equal(items[0].clientId,'1');assert.equal(box.searchFirmCalendarAssignments(items,'missing').length,0);assert.equal(box.searchFirmCalendarAssignments(items,'').length,0);
+assert.match(box.firmCalendarStatusBadge('completed'),/firm-calendar-completed/);assert.match(box.firmCalendarStatusBadge('completed'),/✓/);assert.match(box.firmCalendarStatusBadge('drafting'),/Drafting/);assert.match(box.firmCalendarStatusBadge('waiting-on-reports'),/Waiting on reports/);assert.equal(box.firmCalendarStatusBadge('<script>'),'');assert.equal(box.firmCalendarStatusBadge(''),'');
+
+for(const [value,label] of [['8879-sent','8879 Sent'],['waiting-for-signature','Waiting for Signature'],['signed','Signed'],['ready-to-e-file','Ready to E-file']]) {assert.equal(box.firmCalendarStatusLabel(value),label);assert.equal(box.firmCalendarStatusBadge(value).includes(label),true);}
+assert.equal(box.firmCalendarStatusLabel('__proto__'),'');

@@ -1,0 +1,10 @@
+node_modules/
+build/bin/
+.env
+.env.*
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+.vault-keys/
+*.bfcbackup

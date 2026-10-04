@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BabyFileCab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-brand-panel">
+      <img class="auth-logo" src="logo.png" alt="BabyFileCab" />
+      <div class="auth-brand-copy">
+        <h1>BabyFileCab</h1>
+        <p>Local Document Management System</p>
+        <span>Secure access to the files stored on this computer.</span>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-heading">
+        <span class="auth-eyebrow">WELCOME</span>
+        <h2>Sign in</h2>
+        <p id="authHelp">Enter your BabyFileCab username and password.</p>
+      </div>
+      <label class="auth-field">
+        <span>Username</span>
+        <input id="authUsername" type="text" autocomplete="username" spellcheck="false" />
+      </label>
+      <label class="auth-field">
+        <span>Password</span>
+        <input id="authPassword" type="password" autocomplete="current-password" />
+      </label>
+      <button id="signInBtn" class="primary auth-submit" type="button">Sign In</button>
+      <div class="auth-divider"><span>or</span></div>
+      <button id="showCreateAccountBtn" class="secondary auth-create" type="button">Create New Company Account</button>
+      <button id="showExistingCompanyUserBtn" class="secondary auth-create auth-create-secondary" type="button">Create User Under Existing Company</button>
+      <p class="auth-local-note">Accounts and client files remain local to this computer.</p>
+    </div>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
+    <nav class="app-menubar" id="appMenubar" aria-label="Application menu">
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="fileMenu">File</button>
+        <div class="menu-dropdown hidden" id="fileMenu" role="menu">
+          <button type="button" data-menu-action="new-client">New Client…</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="edit-client-picker">Edit Client…</button>
+          <button type="button" data-menu-action="rename-client-picker">Rename Client…</button>
+          <button type="button" data-menu-action="delete-client-picker" class="menu-danger">Delete Client…</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="restore-client">Restore Client…</button>
+          <button type="button" data-menu-action="archive-client">Archive Client…</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="client-communications">Client Communications…</button>
+          <button type="button" data-menu-action="backup-client">Back Up Client Files… <span class="menu-shortcut">Ctrl+B</span></button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="sign-out">Sign Out <span class="menu-shortcut">Ctrl+Shift+L</span></button>
+          <button type="button" data-menu-action="exit" class="menu-danger">Exit BabyFileCab <span class="menu-shortcut">Ctrl+Q</span></button>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="searchMenu">Search</button>
+        <div class="menu-dropdown hidden" id="searchMenu" role="menu">
+          <button type="button" data-menu-action="search-documents">Search Documents…</button>
+          <button type="button" data-menu-action="search-clients">Search Clients…</button>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="editMenu">Edit</button>
+        <div class="menu-dropdown hidden" id="editMenu" role="menu">
+          <button type="button" data-menu-action="global-find">Global Find… <span class="menu-shortcut">Ctrl+Shift+F</span></button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="unarchive-clients">Unarchive Clients…</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="rename-selected-document">Rename Selected Document… <span class="menu-shortcut">F2</span></button>
+          <button type="button" data-menu-action="delete-selected">Delete Selected</button>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="settingsMenu">Settings</button>
+        <div class="menu-dropdown hidden" id="settingsMenu" role="menu">
+          <button type="button" data-menu-action="shortcut-mapper">Keyboard Shortcuts…</button>
+          <button type="button" data-menu-action="change-password">Change Password…</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="manage-users">Manage Users… <span class="menu-shortcut">M</span></button>
+          <button type="button" data-menu-action="create-company-user">Create User Under Existing Company…</button>
+          <div class="menu-separator"></div>
+          <div class="menu-label">Auto-lock after inactivity</div>
+          <button id="autoLock15MenuItem" type="button" role="menuitemradio" aria-checked="true" data-menu-action="auto-lock-15">✓ 15 minutes</button>
+          <button id="autoLock30MenuItem" type="button" role="menuitemradio" aria-checked="false" data-menu-action="auto-lock-30">30 minutes</button>
+          <button id="autoLock45MenuItem" type="button" role="menuitemradio" aria-checked="false" data-menu-action="auto-lock-45">45 minutes</button>
+          <div class="menu-separator"></div>
+          <button id="lightThemeMenuItem" type="button" data-menu-action="theme-light">✓ Light Theme</button>
+          <button id="darkThemeMenuItem" type="button" data-menu-action="theme-dark">Dark Theme</button>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="toolsMenu">Tools</button>
+        <div class="menu-dropdown hidden" id="toolsMenu" role="menu">
+          <button type="button" data-menu-action="tax-calculator">Federal Tax Calculator…</button>
+          <button type="button" data-menu-action="firm-calendar">Firm Calendar…</button>
+          <button type="button" data-menu-action="engagement-letter">Engagement Letter Generator…</button>
+          <button type="button" data-menu-action="create-invoice">Create an Invoice…</button>
+          <button type="button" data-menu-action="currency-converter">Currency Converter (IRS)…</button>
+          <button type="button" data-menu-action="app-audit-trail">Audit Trail…</button>
+        </div>
+      </div>
+      <div class="menu-root">
+        <button class="menu-trigger" type="button" data-menu="helpMenu">Help</button>
+        <div class="menu-dropdown hidden" id="helpMenu" role="menu">
+          <button type="button" data-menu-action="open-data-folder">📁 Open Data Folder</button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="how-to-use">How to Use BabyFileCab</button>
+          <button type="button" data-menu-action="user-manual">User Manual <span class="menu-shortcut">F1</span></button>
+          <div class="menu-separator"></div>
+          <button type="button" data-menu-action="about">About BabyFileCab</button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="app-header">
+      <div class="brand">
+        <img class="logo" src="logo.png" alt="BabyFileCab" />
+        <div>
+          <div class="brand-title">BabyFileCab</div>
+          <div class="brand-subtitle">Secure document work space for accounting and tax professionals</div>
+          <div class="data-path" id="dataPath"></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="signed-in-user">
+          <div id="signedInName" class="signed-in-name"></div>
+          <div id="signedInRole" class="signed-in-role"></div>
+        </div>
+        <button class="calendar-icon-button" id="openFirmCalendarBtn" type="button" title="Open Firm Calendar" aria-label="Open Firm Calendar"><img src="calendar-icon.png" width="32" height="32" alt="" /></button>
+      </div>
+    </header>
+
+
+
+    <main class="workspace">
+      <aside class="tree-pane">
+        <div class="pane-title">Work Space</div>
+        <input id="treeSearch" class="search" placeholder="Filter clients or documents…" />
+        <div id="tree" class="tree" aria-label="Work Space"></div>
+      </aside>
+
+      <section class="content-pane">
+        <div class="toolbar-wrap">
+          <div class="selection-title" id="selectionTitle">Select a client or document</div>
+          <div class="client-summary-strip" aria-label="Selected client information">
+            <div class="client-summary-cell">
+              <span class="client-summary-label">Client</span>
+              <span id="selectionClientName" class="client-summary-value">—</span>
+            </div>
+            <div class="client-summary-cell client-summary-return">
+              <span class="client-summary-label">Return Type</span>
+              <span id="selectionReturnType" class="client-summary-value return-type-badge">—</span>
+            </div>
+          </div>
+          <div class="toolbar" id="toolbar">
+            <div class="toolbar-group" aria-label="Client actions">
+              <div class="toolbar-group-label">Client</div>
+              <div class="toolbar-group-actions">
+                <button data-action="add-client" title="Keyboard shortcut: C">Add Client</button>
+                <button data-action="edit-client" title="Keyboard shortcut: Shift+C">Edit Client</button>
+                <button data-action="delete-client">Delete Client</button>
+              </div>
+            </div>
+
+            <div class="toolbar-group" aria-label="Tax year actions">
+              <div class="toolbar-group-label">Tax Year</div>
+              <div class="toolbar-group-actions">
+                <button data-action="add-year" title="Keyboard shortcut: Y">Add Tax Year</button>
+                <button data-action="edit-year" title="Keyboard shortcut: Shift+Y">Edit Tax Year</button>
+                <button data-action="delete-year">Delete Tax Year</button>
+              </div>
+            </div>
+
+            <div class="toolbar-group" aria-label="Section actions">
+              <div class="toolbar-group-label">Section</div>
+              <div class="toolbar-group-actions">
+                <button data-action="add-section" title="Keyboard shortcut: S">Add Section</button>
+                <button data-action="edit-section" title="Keyboard shortcut: Shift+S">Edit Section</button>
+                <button data-action="delete-section">Delete Section</button>
+              </div>
+            </div>
+
+            <div class="toolbar-group toolbar-group-files" aria-label="File actions">
+              <div class="toolbar-group-label">Files</div>
+              <div class="toolbar-group-actions">
+                <button class="primary" data-action="upload" title="Keyboard shortcut: F">Upload Files <kbd>F</kbd></button>
+                <button data-action="rename-file" title="Keyboard shortcuts: F2 or Shift+F">Rename File</button>
+                <button class="danger" data-action="delete-file" title="Keyboard shortcut: D">Delete File <kbd>D</kbd></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-shell">
+          <div id="preview" class="preview-empty">
+            <div class="empty-icon">📄</div>
+            <h2>Document Preview</h2>
+            <p>Select a PDF, Word, Excel, email, image, CSV, text file, or notes.txt from the tree.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="addClientBackdrop" class="modal-backdrop hidden">
+    <div class="modal client-form-modal" role="dialog" aria-modal="true" aria-labelledby="addClientTitle">
+      <h2 id="addClientTitle">Add Client</h2>
+      <p>Create a client profile. BabyFileCab will automatically assign the next 5-digit Client ID.</p>
+      <div class="client-form-grid">
+        <label class="client-form-field client-form-wide">
+          <span>Client / Business Name *</span>
+          <input id="clientNameInput" class="modal-input compact" autocomplete="off" />
+        </label>
+        <label class="client-form-field client-form-wide">
+          <span>Address</span>
+          <input id="clientAddressInput" class="modal-input compact" autocomplete="street-address" />
+        </label>
+        <label class="client-form-field">
+          <span>Phone Number</span>
+          <input id="clientPhoneInput" class="modal-input compact" type="tel" autocomplete="tel" />
+        </label>
+        <label class="client-form-field">
+          <span>Email</span>
+          <input id="clientEmailInput" class="modal-input compact" type="email" autocomplete="email" />
+        </label>
+        <label class="client-form-field">
+          <span>SSN or EIN <small>(optional)</small></span>
+          <input id="clientTaxIDInput" class="modal-input compact" autocomplete="off" />
+        </label>
+        <label class="client-form-field">
+          <span>Return Type *</span>
+          <select id="clientReturnTypeInput" class="modal-input compact">
+            <option value="1040">1040 — Individual</option>
+            <option value="1065">1065 — Partnership</option>
+            <option value="1120S">1120S — S Corporation</option>
+            <option value="1120">1120 — C Corporation</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="addClientCancel" class="secondary">Cancel</button>
+        <button id="addClientSave" class="primary">Create Client</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h2 id="modalTitle">Add Client</h2>
+      <p id="modalHelp"></p>
+      <input id="modalInput" class="modal-input" />
+      <div class="modal-actions">
+        <button id="modalCancel" class="secondary">Cancel</button>
+        <button id="modalOK" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clientContextMenu" class="context-menu hidden" role="menu" aria-label="Client menu">
+    <button type="button" data-client-action="edit">Edit Client</button>
+    <button type="button" data-client-action="delete" class="context-danger">Delete Client</button>
+    <div class="context-separator"></div>
+    <button type="button" data-client-action="add-year">Add Tax Year</button>
+    <button type="button" data-client-action="add-section">Add Section</button>
+    <div class="context-separator"></div>
+    <button type="button" data-client-action="properties">Client Properties</button>
+  </div>
+
+  <div id="taxYearContextMenu" class="context-menu hidden" role="menu" aria-label="Tax year menu">
+    <button type="button" data-taxyear-action="edit">Edit Tax Year</button>
+    <button type="button" data-taxyear-action="delete" class="context-danger">Delete Tax Year</button>
+    <div class="context-separator"></div>
+    <button type="button" data-taxyear-action="add-section">Add Section to Tax Year</button>
+  </div>
+
+  <div id="sectionContextMenu" class="context-menu hidden" role="menu" aria-label="Section menu">
+    <button type="button" data-section-action="edit">Edit Section Name</button>
+    <button type="button" data-section-action="upload">Upload File(s) to Section</button>
+    <div class="context-separator"></div>
+    <button type="button" data-section-action="delete" class="context-danger">Delete Section</button>
+  </div>
+
+  <div id="documentContextMenu" class="context-menu hidden" role="menu" aria-label="Document menu">
+    <button type="button" data-document-action="edit">Edit</button>
+    <button type="button" data-document-action="open">Open Document</button>
+    <button type="button" data-document-action="delete" class="context-danger">Delete Document</button>
+    <div class="context-separator"></div>
+    <button type="button" data-document-action="properties">Document Properties</button>
+  </div>
+
+  <div id="firmCalendarContextMenu" class="context-menu hidden" role="menu" aria-label="Firm Calendar client menu">
+    <div id="firmCalendarContextLabel" class="context-menu-label"></div>
+    <button type="button" data-calendar-context-action="status-clear">Clear Status</button>
+    <button type="button" data-calendar-context-action="status-drafting">Drafting</button>
+    <button type="button" data-calendar-context-action="status-waiting-on-reports">Waiting on reports</button>
+    <button type="button" data-calendar-context-action="status-8879-sent">8879 Sent</button>
+    <button type="button" data-calendar-context-action="status-waiting-for-signature">Waiting for Signature</button>
+    <button type="button" data-calendar-context-action="status-signed">Signed</button>
+    <button type="button" data-calendar-context-action="status-ready-to-e-file">Ready to E-file</button>
+    <button type="button" data-calendar-context-action="status-completed">✓ Completed</button>
+    <div class="context-separator"></div>
+    <button type="button" data-calendar-context-action="reassign-preparer">Reassign To Preparer…</button>
+    <button type="button" data-calendar-context-action="reassign">Reassign to New Date…</button>
+    <button type="button" data-calendar-context-action="view">View Client Documents</button>
+    <div class="context-separator"></div>
+    <button type="button" data-calendar-context-action="remove" class="context-danger">Remove from Calendar</button>
+  </div>
+
+  <div id="propertiesBackdrop" class="modal-backdrop hidden">
+    <div class="modal properties-modal" role="dialog" aria-modal="true" aria-labelledby="propertiesTitle">
+      <h2 id="propertiesTitle">Client Properties</h2>
+      <div class="properties-grid">
+        <div class="property-label">Client Name</div>
+        <div id="propertyClientName" class="property-value"></div>
+        <div class="property-label">Client ID</div>
+        <div id="propertyClientID" class="property-value property-id"></div>
+        <div class="property-label">Return Type</div>
+        <div id="propertyReturnType" class="property-value"></div>
+        <div class="property-label">Address</div>
+        <div id="propertyAddress" class="property-value"></div>
+        <div class="property-label">Phone</div>
+        <div id="propertyPhone" class="property-value"></div>
+        <div class="property-label">Email</div>
+        <div id="propertyEmail" class="property-value"></div>
+        <div class="property-label">SSN / EIN</div>
+        <div id="propertyTaxID" class="property-value property-path"></div>
+        <div class="property-label">Local Folder</div>
+        <div id="propertyClientPath" class="property-value property-path"></div>
+      </div>
+      <div class="modal-actions">
+        <button id="propertiesClose" class="primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="documentPropertiesBackdrop" class="modal-backdrop hidden">
+    <div class="modal document-properties-modal" role="dialog" aria-modal="true" aria-labelledby="documentPropertiesTitle">
+      <h2 id="documentPropertiesTitle">Document Properties</h2>
+      <div class="properties-grid document-properties-grid">
+        <div class="property-label">Document</div>
+        <div id="docPropertyName" class="property-value"></div>
+        <div class="property-label">Client</div>
+        <div id="docPropertyClient" class="property-value"></div>
+        <div class="property-label">Location</div>
+        <div id="docPropertyLocation" class="property-value property-path"></div>
+        <div class="property-label">File Size</div>
+        <div id="docPropertySize" class="property-value"></div>
+        <div class="property-label">Modified</div>
+        <div id="docPropertyModified" class="property-value"></div>
+      </div>
+      <label class="document-description-field">
+        <span>Document Description</span>
+        <textarea id="documentDescriptionInput" rows="6" placeholder="Describe this document so you can find it quickly with Global Find…"></textarea>
+        <small>Global Find searches both the document name and this description.</small>
+      </label>
+      <div class="modal-actions">
+        <button id="documentPropertiesCancel" class="secondary">Cancel</button>
+        <button id="documentPropertiesSave" class="primary">Save Description</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="globalFindBackdrop" class="modal-backdrop hidden">
+    <div class="modal global-find-modal" role="dialog" aria-modal="true" aria-labelledby="globalFindTitle">
+      <h2 id="globalFindTitle">Search Documents</h2>
+      <p>Search all BabyFileCab documents by file name, description, client, or folder.</p>
+      <div class="global-find-search-row">
+        <input id="globalFindInput" class="modal-input compact" type="search" placeholder="Search by client or document name…" autocomplete="off" />
+        <button id="globalFindSearch" class="primary">Search</button>
+      </div>
+      <div id="globalFindStatus" class="global-find-status">Type a word or phrase to search.</div>
+      <div id="globalFindResults" class="global-find-results"></div>
+      <div class="modal-actions">
+        <button id="globalFindClose" class="primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clientPickerBackdrop" class="modal-backdrop hidden">
+    <div class="modal client-picker-modal" role="dialog" aria-modal="true" aria-labelledby="clientPickerTitle">
+      <h2 id="clientPickerTitle">Choose Client</h2>
+      <p id="clientPickerHelp">Choose a client from the list below.</p>
+      <input id="clientPickerSearch" class="modal-input compact" type="search" placeholder="Filter clients…" autocomplete="off" />
+      <div id="clientPickerList" class="client-picker-list"></div>
+      <div class="modal-actions">
+        <button id="clientPickerCancel" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clientCommunicationsBackdrop" class="modal-backdrop hidden">
+    <div class="modal client-communications-modal" role="dialog" aria-modal="true" aria-labelledby="clientCommunicationsTitle">
+      <h2 id="clientCommunicationsTitle">Client Communications</h2>
+      <p>Contact information for all active BabyFileCab clients. Search by client name, then click a row to jump to that client in the Work Space.</p>
+      <div class="communications-search-row">
+        <input id="clientCommunicationsSearch" class="modal-input compact" type="search" placeholder="Search clients by name…" autocomplete="off" />
+        <span id="clientCommunicationsStatus" class="communications-search-status"></span>
+      </div>
+      <div class="communications-table-wrap">
+        <table class="communications-table">
+          <thead><tr><th>Client</th><th>Return Type</th><th>Email Address</th><th>Phone Number</th></tr></thead>
+          <tbody id="clientCommunicationsBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button id="clientCommunicationsClose" class="primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="createAccountBackdrop" class="modal-backdrop hidden">
+    <div class="modal account-modal" role="dialog" aria-modal="true" aria-labelledby="createAccountTitle">
+      <div class="account-modal-heading">
+        <div>
+          <span class="auth-eyebrow">NEW LOCAL COMPANY</span>
+          <h2 id="createAccountTitle">Create Company & Administrator</h2>
+          <p>Create a local company workspace and its first Administrator account. Users added to this company will share the same clients and documents.</p>
+        </div>
+      </div>
+
+      <div class="account-section">
+        <h3>Company & Account Information</h3>
+        <div class="account-grid">
+          <label class="account-field account-wide">
+            <span>Company Name *</span>
+            <input id="createCompanyName" type="text" autocomplete="organization" />
+          </label>
+          <label class="account-field account-wide">
+            <span>Username *</span>
+            <input id="createUsername" type="text" autocomplete="username" spellcheck="false" />
+          </label>
+          <label class="account-field">
+            <span>First Name *</span>
+            <input id="createFirstName" type="text" autocomplete="given-name" />
+          </label>
+          <label class="account-field">
+            <span>Last Name *</span>
+            <input id="createLastName" type="text" autocomplete="family-name" />
+          </label>
+          <label class="account-field">
+            <span>Email Address *</span>
+            <input id="createEmail" type="email" autocomplete="email" />
+          </label>
+          <label class="account-field">
+            <span>Phone Number *</span>
+            <input id="createPhone" type="tel" autocomplete="tel" />
+          </label>
+          <label class="account-field">
+            <span>Password *</span>
+            <input id="createPassword" type="password" autocomplete="new-password" />
+          </label>
+          <label class="account-field">
+            <span>Confirm Password *</span>
+            <input id="createConfirmPassword" type="password" autocomplete="new-password" />
+          </label>
+          <label class="account-field account-wide">
+            <span>Role *</span>
+            <select id="createRole">
+              <option value="administrator">Administrator</option>
+              <option value="staff">Staff</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="account-section irs-section">
+        <div class="account-section-title">
+          <h3>IRS Representative Information</h3>
+          <span>Optional</span>
+        </div>
+        <div class="account-grid">
+          <label class="account-field account-wide">
+            <span>Street Address</span>
+            <input id="createStreetAddress" type="text" autocomplete="street-address" />
+          </label>
+          <label class="account-field">
+            <span>City</span>
+            <input id="createCity" type="text" autocomplete="address-level2" />
+          </label>
+          <div class="account-inline-fields">
+            <label class="account-field">
+              <span>State</span>
+              <input id="createState" type="text" maxlength="30" autocomplete="address-level1" />
+            </label>
+            <label class="account-field">
+              <span>ZIP</span>
+              <input id="createZIP" type="text" maxlength="12" autocomplete="postal-code" />
+            </label>
+          </div>
+          <label class="account-field">
+            <span>CAF #</span>
+            <input id="createCAF" type="text" autocomplete="off" />
+          </label>
+          <label class="account-field">
+            <span>PTIN</span>
+            <input id="createPTIN" type="text" autocomplete="off" placeholder="P########" />
+          </label>
+          <label class="account-field">
+            <span>Telephone #</span>
+            <input id="createTelephone" type="tel" autocomplete="tel" />
+          </label>
+          <label class="account-field">
+            <span>Fax No</span>
+            <input id="createFax" type="tel" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions account-actions">
+        <button id="createAccountCancel" class="secondary" type="button">Cancel</button>
+        <button id="createAccountSave" class="primary" type="button">Create Company & Account</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="existingCompanyUserBackdrop" class="modal-backdrop hidden">
+    <div class="modal existing-company-user-modal" role="dialog" aria-modal="true" aria-labelledby="existingCompanyUserTitle">
+      <div class="account-modal-heading">
+        <div>
+          <span class="auth-eyebrow">EXISTING COMPANY</span>
+          <h2 id="existingCompanyUserTitle">Create User Under Existing Company</h2>
+          <p>Choose the company this user should belong to. For security, an active Administrator for that company must authorize the new account with their username and password. The new user will receive access to the same company clients and documents.</p>
+        </div>
+      </div>
+
+      <div class="existing-company-company-row">
+        <label class="account-field account-wide">
+          <span>Company *</span>
+          <select id="existingCompanySelect"></select>
+        </label>
+      </div>
+
+      <div class="account-section compact-account-section">
+        <h3>New User</h3>
+        <div class="account-grid">
+          <label class="account-field account-wide">
+            <span>Username *</span>
+            <input id="existingUsername" type="text" autocomplete="username" spellcheck="false" />
+          </label>
+          <label class="account-field">
+            <span>First Name *</span>
+            <input id="existingFirstName" type="text" autocomplete="given-name" />
+          </label>
+          <label class="account-field">
+            <span>Last Name *</span>
+            <input id="existingLastName" type="text" autocomplete="family-name" />
+          </label>
+          <label class="account-field">
+            <span>Email Address *</span>
+            <input id="existingEmail" type="email" autocomplete="email" />
+          </label>
+          <label class="account-field">
+            <span>Phone Number *</span>
+            <input id="existingPhone" type="tel" autocomplete="tel" />
+          </label>
+          <label class="account-field">
+            <span>Password *</span>
+            <input id="existingPassword" type="password" autocomplete="new-password" />
+          </label>
+          <label class="account-field">
+            <span>Confirm Password *</span>
+            <input id="existingConfirmPassword" type="password" autocomplete="new-password" />
+          </label>
+          <label class="account-field account-wide">
+            <span>Role *</span>
+            <select id="existingRole">
+              <option value="staff">Staff</option>
+              <option value="administrator">Administrator</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="account-section irs-section compact-account-section">
+        <div class="account-section-title">
+          <h3>IRS Representative Information</h3>
+          <span>Optional</span>
+        </div>
+        <div class="account-grid">
+          <label class="account-field account-wide">
+            <span>Street Address</span>
+            <input id="existingStreetAddress" type="text" autocomplete="street-address" />
+          </label>
+          <label class="account-field">
+            <span>City</span>
+            <input id="existingCity" type="text" autocomplete="address-level2" />
+          </label>
+          <div class="account-inline-fields">
+            <label class="account-field">
+              <span>State</span>
+              <input id="existingState" type="text" maxlength="30" autocomplete="address-level1" />
+            </label>
+            <label class="account-field">
+              <span>ZIP</span>
+              <input id="existingZIP" type="text" maxlength="12" autocomplete="postal-code" />
+            </label>
+          </div>
+          <label class="account-field">
+            <span>CAF #</span>
+            <input id="existingCAF" type="text" autocomplete="off" />
+          </label>
+          <label class="account-field">
+            <span>PTIN</span>
+            <input id="existingPTIN" type="text" autocomplete="off" placeholder="P########" />
+          </label>
+          <label class="account-field">
+            <span>Telephone #</span>
+            <input id="existingTelephone" type="tel" autocomplete="tel" />
+          </label>
+          <label class="account-field">
+            <span>Fax No</span>
+            <input id="existingFax" type="tel" autocomplete="off" />
+          </label>
+        </div>
+        <p class="existing-company-help">The Phone Number above is the user's account contact number. Telephone No. may be the representative's IRS contact number.</p>
+      </div>
+
+      <div class="account-section admin-auth-section compact-account-section">
+        <h3>Administrator Authorization</h3>
+        <div class="account-grid">
+          <label class="account-field account-wide">
+            <span>Admin Username *</span>
+            <input id="existingAdminUsername" type="text" autocomplete="username" spellcheck="false" />
+          </label>
+          <label class="account-field account-wide">
+            <span>Admin Password *</span>
+            <input id="existingAdminPassword" type="password" autocomplete="current-password" />
+          </label>
+        </div>
+        <p class="existing-company-help">The administrator password is used only to authorize this account. It is verified locally and is not stored again.</p>
+      </div>
+
+      <div class="modal-actions account-actions">
+        <button id="existingCompanyUserCancel" class="secondary" type="button">Cancel</button>
+        <button id="existingCompanyUserSave" class="primary" type="button">Create User</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="manageUsersBackdrop" class="modal-backdrop hidden">
+    <div class="modal manage-users-modal" role="dialog" aria-modal="true" aria-labelledby="manageUsersTitle">
+      <div class="manual-heading-row">
+        <div>
+          <span class="auth-eyebrow">COMPANY USERS</span>
+          <h2 id="manageUsersTitle">Manage Users</h2>
+          <p id="manageUsersHelp">Users in your company share the same local client and document workspace.</p>
+        </div>
+        <button id="manageUsersAdd" class="primary" type="button">Add User</button>
+      </div>
+      <div class="manage-users-table-wrap">
+        <table class="communications-table manage-users-table">
+          <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Email</th><th>Phone</th><th>Vault access</th></tr></thead>
+          <tbody id="manageUsersBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button id="manageUsersClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shortcutMapperBackdrop" class="modal-backdrop hidden">
+    <div class="modal shortcut-mapper-modal" role="dialog" aria-modal="true" aria-labelledby="shortcutMapperTitle">
+      <h2 id="shortcutMapperTitle">Keyboard Shortcuts</h2>
+      <p>Select a numbered keybinding, then click Modify. Alternate bindings can be changed separately. Click Save to apply your changes.</p>
+      <p>Saved for your account on this computer. Notes formatting, dialog keys, Shift-click selection, and the G then S settings shortcut remain fixed. Ctrl+B formats bold while editing notes. Operating-system shortcuts may take priority.</p>
+      <div class="shortcut-mapper-scroll"><table><thead><tr><th>#</th><th>Action</th><th>Shortcut</th></tr></thead><tbody id="shortcutMapperRows"></tbody></table></div>
+      <div class="modal-actions">
+        <button id="shortcutMapperModify" type="button" class="primary" disabled>Modify…</button>
+        <button id="shortcutMapperClear" type="button" class="secondary" disabled>Clear</button>
+        <button id="shortcutMapperReset" type="button" class="secondary">Restore Defaults</button>
+        <button id="shortcutMapperCancel" type="button" class="secondary">Cancel</button>
+        <button id="shortcutMapperSave" type="button" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shortcutEditBackdrop" class="modal-backdrop hidden">
+    <div class="modal shortcut-edit-modal" role="dialog" aria-modal="true" aria-labelledby="shortcutEditTitle">
+      <h2 id="shortcutEditTitle">Modify Shortcut</h2>
+      <p id="shortcutEditName"></p>
+      <div class="shortcut-modifiers">
+        <label><input id="shortcutEditCtrl" type="checkbox" /> Ctrl</label>
+        <label><input id="shortcutEditAlt" type="checkbox" /> Alt</label>
+        <label><input id="shortcutEditShift" type="checkbox" /> Shift</label>
+      </div>
+      <label for="shortcutEditKey">Key</label>
+      <select id="shortcutEditKey"></select>
+      <p id="shortcutEditPreview" aria-live="polite"></p>
+      <p id="shortcutEditError" class="shortcut-edit-error" role="alert"></p>
+      <div class="modal-actions"><button id="shortcutEditOK" type="button" class="primary">OK</button><button id="shortcutEditCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+  </div>
+
+  <div id="changePasswordBackdrop" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+      <h2 id="changePasswordTitle">Change Password</h2>
+      <p>Your documents stay encrypted and accessible. Use at least 8 characters.</p>
+      <label for="changeCurrentPassword">Current password</label>
+      <input id="changeCurrentPassword" type="password" autocomplete="current-password" />
+      <label for="changeNewPassword">New password</label>
+      <input id="changeNewPassword" type="password" autocomplete="new-password" />
+      <label for="changeConfirmPassword">Confirm new password</label>
+      <input id="changeConfirmPassword" type="password" autocomplete="new-password" />
+      <div class="modal-actions">
+        <button id="changePasswordCancel" class="secondary" type="button">Cancel</button>
+        <button id="changePasswordSave" class="primary" type="button">Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="vaultEnrollmentBackdrop" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="vaultEnrollmentTitle">
+      <h2 id="vaultEnrollmentTitle">Join company vault</h2>
+      <p id="vaultEnrollmentHelp">Enter your own account password to activate vault access. The administrator does not need to know it.</p>
+      <label for="vaultEnrollmentPassword">Your password</label>
+      <input id="vaultEnrollmentPassword" type="password" autocomplete="current-password" />
+      <div class="modal-actions">
+        <button id="vaultEnrollmentCancel" class="secondary" type="button">Cancel</button>
+        <button id="vaultEnrollmentSave" class="primary" type="button">Enroll</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="userManualBackdrop" class="modal-backdrop hidden">
+    <div class="modal user-manual-modal" role="dialog" aria-modal="true" aria-labelledby="userManualTitle">
+      <div class="manual-heading-row">
+        <div>
+          <span class="auth-eyebrow">HELP &amp; SUPPORT</span>
+          <h2 id="userManualTitle">BabyFileCab User Manual</h2>
+          <p>Keyboard shortcuts and workflow reference.</p>
+        </div>
+        <button id="userManualCloseTop" class="secondary" type="button">Close</button>
+      </div>
+
+      <div class="manual-scroll">
+        <section class="manual-section getting-started-guide" id="gettingStartedGuide">
+          <h3>How to Use BabyFileCab</h3>
+          <p>Start with a client, organize their documents, then plan the work on your Firm Calendar. Open a topic below for instructions.</p>
+          <details open><summary>1. Create a client</summary><p>Click <strong>Add Client</strong> in the main toolbar. Enter the client’s name and contact information, choose their return type (1040, 1065, 1120S, or 1120), and save. The client appears in the document tree with a Permanent Folder and notes.txt. Right-click the client and choose <strong>Edit Client</strong> to update their information.</p></details>
+          <details><summary>2. Organize tax years and sections</summary><p>Select the client and choose <strong>Add Tax Year</strong>. Select that year and choose <strong>Add Section</strong> to group documents by topic. Use the Permanent Folder for documents you need across years. Creating a section leaves existing documents in their original sections.</p><p>A section must be empty before you can delete it. Delete each document first; any remaining files or subfolders prevent section deletion.</p></details>
+          <details><summary>3. Upload, preview, and rename documents</summary><p>Select the destination section in the document tree, click <strong>Upload</strong>, and choose your files. Click a document to preview it. Right-click a document and choose <strong>Edit</strong> to rename it. Shift + left-click another document selects a range within the same client.</p><p>To keep client notes, open <strong>notes.txt</strong>, enter your notes, and press <strong>Ctrl+S</strong> to save.</p></details>
+          <details><summary>4. Find clients and documents</summary><p>Open <strong>Search</strong> in the top menu and choose <strong>Search Clients</strong> or <strong>Search Documents</strong>. Search Clients helps you jump to a client in the tree. Search Documents helps you find documents by name and other available details.</p></details>
+          <details><summary>5. Schedule work in the Firm Calendar</summary><p>Click the calendar icon on the main page or open <strong>Tools → Firm Calendar</strong>. Search for any active client by name or ID. Select the matching client, then choose <strong>Assign a Date &amp; Preparer</strong>.</p><p>For a scheduled client, select the assignment and choose <strong>Go to Calendar</strong> to jump to that day. Use <strong>Change Assignment</strong> to change the preparer, move the date, or update the status. You can also right-click a client on the calendar.</p><p>Statuses include Drafting, Waiting on Reports, Completed, 8879 Sent, Waiting for Signature, Signed, and Ready to E-file. Completed shows a green check mark. Clear Status removes the status label. These labels track your workflow; they do not send forms or e-file returns.</p><p>Use the initials menu in the top-right corner to view the Entire Firm or an individual preparer. Click a scheduled client to see their documents; choose <strong>Open Client in Work Space</strong> to return to their document tree. The × removes only that calendar assignment.</p></details>
+          <details><summary>6. Use tools and make backups</summary><p>Under <strong>Tools</strong>, open the tax calculator, engagement letter generator, invoice creator, currency converter, or audit trail as needed.</p><p>Open <strong>File → Back Up Client Files…</strong>, select the client, and choose where to save the encrypted .bfcbackup file. Keep your backups somewhere safe. A client backup is different from a complete copy of the company workspace and its vault-key files.</p></details>
+          <details><summary>7. Adjust settings and protect your workspace</summary><p>Use <strong>Settings</strong> to switch light/dark themes, change your password, or choose an inactivity lock of 15, 30, or 45 minutes. Under <strong>Keyboard Shortcuts</strong>, select a numbered binding, click <strong>Modify</strong>, choose the modifiers and key, then save your changes.</p><p>Use <strong>File → Sign Out</strong> when leaving the computer. Keep your company data and vault-key files backed up together; losing the key files can prevent access to encrypted documents. <strong>Help → Open Data Folder</strong> shows where the app stores its data. Avoid moving or deleting files there while BabyFileCab is running.</p></details>
+        </section>
+
+        <section class="manual-section">
+          <h3>Main application</h3>
+          <div id="mappedShortcutHelp" class="shortcut-grid"></div>
+          <p>Shift + left-click selects a range of documents. G then S opens Settings. Change keyboard mappings under Settings → Keyboard Shortcuts.</p>
+        </section>
+
+        <section class="manual-section">
+          <h3>Client notes (notes.txt)</h3>
+          <div class="shortcut-grid">
+            <kbd>Ctrl+S</kbd><span>Save the current client notes.</span>
+            <kbd>Ctrl+B</kbd><span>Toggle bold formatting while editing client notes.</span>
+            <kbd>Ctrl+I</kbd><span>Toggle italic formatting while editing client notes.</span>
+            <kbd>Ctrl+U</kbd><span>Toggle underline formatting while editing client notes.</span>
+          </div>
+        </section>
+
+        <section class="manual-section">
+          <h3>Client Backup</h3>
+          <div class="shortcut-grid">
+            <kbd>File</kbd><span>Choose <strong>Back Up Client Files…</strong>, directly below Client Communications, to open the full active client list.</span>
+            <kbd>Client</kbd><span>Select one client to create an encrypted .bfcbackup archive containing that client&apos;s files and metadata.</span>
+            <kbd>Ctrl+B</kbd><span>Open the same client backup window from the main workspace.</span>
+          </div>
+          <p class="manual-note">After choosing a client, BabyFileCab asks where to save the encrypted backup. Creating a backup does not change or remove the client&apos;s original files.</p>
+        </section>
+
+        <section class="manual-section">
+          <h3>Firm Calendar</h3>
+          <div class="shortcut-grid">
+            <kbd>Tools</kbd><span>Open <strong>Firm Calendar…</strong> to schedule clients on the 2026 weekly calendar.</span>
+            <kbd>← / →</kbd><span>Move backward or forward one week.</span>
+            <kbd>Week</kbd><span>Use the week dropdown to jump directly to another week of 2026.</span>
+            <kbd>＋</kbd><span>Assign one or more clients to a calendar day. Multiple clients can share the same date.</span>
+            <kbd>Client</kbd><span>Each scheduled client shows its return type (1040, 1065, 1120S, or 1120). Click the client name to view the client's Permanent Folder and documents organized by tax year.</span>
+            <kbd>Right-click Client</kbd><span>Open the calendar client menu and choose <strong>Reassign to New Date…</strong> to move that client to another 2026 date.</span>
+            <kbd>×</kbd><span>Remove a client assignment from that day without deleting the client or any documents.</span>
+          </div>
+          <p class="manual-note">Firm Calendar assignments are stored inside the local company workspace so users signed into the same local BabyFileCab company see the same schedule.</p>
+        </section>
+
+        <section class="manual-section">
+          <h3>Engagement Letter</h3>
+          <div class="shortcut-grid">
+            <kbd>Tools</kbd><span>Open <strong>Engagement Letter Generator…</strong> to create a CPA firm engagement letter from information already stored in BabyFileCab.</span>
+            <kbd>Logo</kbd><span>Use <strong>Browse Logo…</strong> to choose a PNG or JPEG firm logo. The logo is saved for the current company account and appears in the preview and generated letters.</span>
+            <kbd>Client</kbd><span>Use the Client dropdown to choose any active client already entered in BabyFileCab. The client name, address, phone, and email are pulled from that client profile.</span>
+            <kbd>Preparer</kbd><span>Use the Preparer dropdown to choose an Administrator or Staff user. BabyFileCab uses that preparer&apos;s stored name, company, address, phone, and email in the letter.</span>
+            <kbd>Service</kbd><span>Use the Service dropdown to independently choose 1040, 1041, 1065, 1120S, 1120, Bookkeeping, or Tax Projection.</span>
+            <kbd>Tax Year</kbd><span>Choose a tax year from 2018 through 2026.</span>
+            <kbd>Fee</kbd><span>Choose Flat Fee or Hourly Rate and enter the agreed amount in U.S. dollars.</span>
+            <kbd>Generate</kbd><span>At the bottom of the generator, click Generate PDF Document or Generate MS Word Document to create the finished engagement letter from the selections shown in the preview.</span>
+          </div>
+          <p class="manual-note">Choose the company logo, client, preparer, service, tax year (2018–2026), and fee arrangement. Client, preparer, service, tax year, and fee arrangement are real dropdown controls. The preview updates automatically, and the buttons at the bottom generate the finished PDF or Microsoft Word engagement letter.</p>
+        </section>
+
+        <section class="manual-section">
+          <h3>Create an Invoice</h3>
+          <div class="shortcut-list">
+            <kbd>Tools</kbd><span>Open <strong>Create an Invoice…</strong> to build a client invoice from information stored in BabyFileCab.</span>
+            <kbd>Client</kbd><span>Choose an existing BabyFileCab client. The saved client name, address, phone, and email are used in the invoice.</span>
+            <kbd>Billing</kbd><span>Choose a service and tax year, then select Flat Fee or Hourly Rate. Hourly invoices calculate the total from hours × hourly rate.</span>
+            <kbd>Generate</kbd><span>Scroll to the bottom and choose Generate MS Word Document or Generate PDF Document.</span>
+          </div>
+          <h3>Currency Converter (IRS)</h3>
+          <div class="shortcut-grid">
+            <kbd>Tools</kbd><span>Open <strong>Currency Converter (IRS)…</strong> to convert between U.S. dollars and currencies listed in the IRS yearly-average exchange-rate table.</span>
+            <kbd>Year</kbd><span>Choose an IRS yearly-average rate year from 2021 through 2025.</span>
+            <kbd>Direction</kbd><span>Convert foreign currency to USD or USD to foreign currency.</span>
+            <kbd>Currency</kbd><span>Choose the country/currency from the IRS table, enter an amount, and BabyFileCab applies the selected yearly-average rate.</span>
+          </div>
+          <p class="manual-note">The IRS states that it has no official exchange rate and generally accepts a posted rate used consistently. The IRS page says to divide a foreign-currency amount by the yearly-average table rate to convert it to U.S. dollars, and multiply a U.S.-dollar amount by the rate to convert it to foreign currency. For a specific transaction, the applicable spot rate may be required instead of a yearly average.</p>
+
+          <h3>Audit Trail</h3>
+          <div class="shortcut-grid">
+            <kbd>Tools</kbd><span>Open <strong>Audit Trail…</strong> to review company-wide BabyFileCab activity.</span>
+            <kbd>Search</kbd><span>Filter the history by user, client, action, or details.</span>
+            <kbd>Refresh</kbd><span>Reload the latest activity from the local company workspace.</span>
+          </div>
+          <p class="manual-note">The company-wide audit trail records who performed important BabyFileCab actions, when they occurred, the affected client when available, and the action details. Existing per-client history is imported into the company-wide trail the first time it is created.</p>
+        </section>
+
+        <section class="manual-section">
+          <h3>Document Properties</h3>
+          <div class="shortcut-grid">
+            <kbd>Ctrl+S</kbd><span>Save the Document Description / keywords.</span>
+            <kbd>Esc</kbd><span>Save the Document Description and close Document Properties.</span>
+          </div>
+        </section>
+
+        <section class="manual-section">
+          <h3>BabyFileCab file picker</h3>
+          <p>BabyFileCab currently uses the operating system file picker. These standard file-picker shortcuts are supported when provided by the active Linux/Windows/macOS file dialog.</p>
+          <div class="shortcut-grid">
+            <kbd>Alt+Left</kbd><span>Go back to the previous folder.</span>
+            <kbd>Alt+Up</kbd><span>Go up one folder level.</span>
+            <kbd>F5</kbd><span>Refresh the current folder.</span>
+            <kbd>Ctrl+A</kbd><span>Select all visible files.</span>
+            <kbd>Enter</kbd><span>Open the highlighted folder or choose the highlighted file(s).</span>
+            <kbd>Esc</kbd><span>Close/cancel the file picker.</span>
+          </div>
+        </section>
+
+        <section class="manual-section">
+          <h3>Search windows</h3>
+          <div class="shortcut-grid">
+            <kbd>Enter</kbd><span>Run Global Find when the search box has focus.</span>
+            <kbd>Enter</kbd><span>Open the selected Global Find result when the results list has focus.</span>
+            <kbd>Enter</kbd><span>Move to the next match in Find in PDF.</span>
+            <kbd>Esc</kbd><span>Close Find in PDF.</span>
+          </div>
+        </section>
+
+        <section class="manual-section">
+          <h3>General dialog behavior</h3>
+          <div class="shortcut-grid">
+            <kbd>Enter</kbd><span>Submit or open the selected item in many BabyFileCab dialogs.</span>
+            <kbd>Esc</kbd><span>Close or cancel many BabyFileCab secondary windows.</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-actions">
+        <button id="userManualClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="engagementLetterBackdrop" class="modal-backdrop hidden">
+    <div class="modal engagement-letter-modal engagement-letter-rebuilt" role="dialog" aria-modal="true" aria-labelledby="engagementLetterTitle">
+      <div class="engagement-letter-heading">
+        <div>
+          <span class="auth-eyebrow">TOOLS • CPA FIRM ENGAGEMENT LETTER</span>
+          <h2 id="engagementLetterTitle">Engagement Letter Generator</h2>
+          <p>Select the client, preparer, service, tax year, and fee. BabyFileCab builds the finished engagement letter below.</p>
+        </div>
+        <button id="engagementLetterCloseTop" class="secondary" type="button">Close</button>
+      </div>
+
+      <div class="engagement-letter-scroll engagement-rebuilt-scroll">
+        <section class="engagement-rebuilt-form" aria-label="Engagement letter information">
+          <div class="engagement-company-account-block engagement-account-banner">
+            <span>Company Account</span>
+            <strong id="engagementCompanyAccount">Company</strong>
+          </div>
+
+          <div class="engagement-rebuilt-row engagement-logo-control-row">
+            <label>Firm Logo</label>
+            <div class="engagement-logo-control">
+              <div class="engagement-logo-preview-box">
+                <img id="engagementFirmLogoPreview" class="engagement-firm-logo hidden" alt="Firm logo preview" />
+                <div id="engagementFirmLogoPlaceholder" class="engagement-logo-placeholder">No Logo Selected</div>
+              </div>
+              <div class="engagement-logo-buttons">
+                <button id="engagementBrowseLogo" class="secondary" type="button">Browse Logo…</button>
+                <button id="engagementRemoveLogo" class="secondary" type="button">Remove Logo</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="engagementClient">Client</label>
+            <div class="engagement-control-stack">
+              <select id="engagementClient" aria-describedby="engagementClientSummary">
+                <option value="">Select a client…</option>
+              </select>
+              <small id="engagementClientSummary">Choose a client already entered in BabyFileCab.</small>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="engagementPreparer">Preparer</label>
+            <div class="engagement-control-stack">
+              <select id="engagementPreparer" aria-describedby="engagementPreparerSummary">
+                <option value="">Select a preparer…</option>
+              </select>
+              <small id="engagementPreparerSummary">Choose the preparer responsible for this engagement.</small>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="engagementService">Service</label>
+            <div class="engagement-control-stack">
+              <select id="engagementService">
+                <option value="">Select a service…</option>
+                <option value="1040">1040</option>
+                <option value="1041">1041</option>
+                <option value="1065">1065</option>
+                <option value="1120S">1120S</option>
+                <option value="1120">1120</option>
+                <option value="Bookkeeping">Bookkeeping</option>
+                <option value="Tax Projection">Tax Projection</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="engagementTaxYear">Tax Year</label>
+            <div class="engagement-control-stack">
+              <select id="engagementTaxYear">
+                <option value="2018">2018</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="engagementFeeType">Fee Arrangement</label>
+            <div class="engagement-control-stack">
+              <select id="engagementFeeType">
+                <option value="Flat Fee">Flat Fee</option>
+                <option value="Hourly Rate">Hourly Rate</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label id="engagementFeeLabel" for="engagementFeeValue">Flat Fee (USD $)</label>
+            <div class="engagement-control-stack">
+              <div class="engagement-money-input">
+                <span aria-hidden="true">$</span>
+                <input id="engagementFeeValue" type="text" inputmode="decimal" autocomplete="off" placeholder="1,500.00" aria-label="Engagement fee in US dollars" />
+              </div>
+            </div>
+          </div>
+
+          <input id="engagementDate" type="hidden" />
+        </section>
+
+        <section class="engagement-letter-preview-panel engagement-rebuilt-preview-panel" aria-label="Engagement letter preview">
+          <div class="engagement-preview-heading">
+            <div>
+              <span>LETTER PREVIEW</span>
+              <strong id="engagementPreviewClient">Select a client</strong>
+            </div>
+            <span id="engagementPreviewService" class="engagement-service-pill">Service</span>
+          </div>
+          <article id="engagementPreview" class="engagement-preview engagement-rebuilt-preview"></article>
+        </section>
+
+        <section class="engagement-bottom-generate" aria-label="Generate engagement letter">
+          <div class="engagement-bottom-generate-copy">
+            <strong>Generate Engagement Letter</strong>
+            <span>Create the finished letter using the client, service, tax year, preparer, and fee shown above.</span>
+          </div>
+          <div class="engagement-bottom-generate-buttons">
+            <button id="engagementGenerateWord" class="primary engagement-generate-button" type="button">Generate MS Word Document</button>
+            <button id="engagementGeneratePDF" class="primary engagement-generate-button" type="button">Generate PDF Document</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-actions engagement-letter-actions">
+        <button id="engagementLetterClose" class="secondary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="invoiceBackdrop" class="modal-backdrop hidden">
+    <div class="modal engagement-letter-modal engagement-letter-rebuilt invoice-modal" role="dialog" aria-modal="true" aria-labelledby="invoiceTitle">
+      <div class="engagement-letter-heading">
+        <div>
+          <span class="auth-eyebrow">TOOLS • CLIENT INVOICE</span>
+          <h2 id="invoiceTitle">Create an Invoice</h2>
+          <p>Select the client and service, enter the billing information, preview the invoice, then generate a PDF or Microsoft Word document.</p>
+        </div>
+        <button id="invoiceCloseTop" class="secondary" type="button">Close</button>
+      </div>
+
+      <div class="invoice-scroll-area">
+        <div id="invoiceScrollContent" class="engagement-letter-scroll engagement-rebuilt-scroll invoice-scroll" tabindex="0" aria-label="Scrollable invoice generator content">
+        <section class="engagement-rebuilt-form" aria-label="Invoice information">
+          <div class="engagement-company-account-block engagement-account-banner">
+            <span>Company Account</span>
+            <strong id="invoiceCompanyAccount">Company</strong>
+          </div>
+
+          <div class="engagement-rebuilt-row engagement-logo-control-row">
+            <label>Firm Logo</label>
+            <div class="engagement-logo-control">
+              <div class="engagement-logo-preview-box">
+                <img id="invoiceFirmLogoPreview" class="engagement-firm-logo hidden" alt="Firm logo preview" />
+                <div id="invoiceFirmLogoPlaceholder" class="engagement-logo-placeholder">No Logo Selected</div>
+              </div>
+              <div class="engagement-logo-buttons">
+                <button id="invoiceBrowseLogo" class="secondary" type="button">Browse Logo…</button>
+                <button id="invoiceRemoveLogo" class="secondary" type="button">Remove Logo</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceClient">Client</label>
+            <div class="engagement-control-stack">
+              <select id="invoiceClient" aria-describedby="invoiceClientSummary">
+                <option value="">Select a client…</option>
+              </select>
+              <small id="invoiceClientSummary">Choose a client already entered in BabyFileCab.</small>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoicePreparer">Preparer</label>
+            <div class="engagement-control-stack">
+              <select id="invoicePreparer" aria-describedby="invoicePreparerSummary">
+                <option value="">Select a preparer…</option>
+              </select>
+              <small id="invoicePreparerSummary">Choose the preparer responsible for this invoice.</small>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceService">Service</label>
+            <div class="engagement-control-stack">
+              <select id="invoiceService">
+                <option value="">Select a service…</option>
+                <option value="1040">1040</option>
+                <option value="1041">1041</option>
+                <option value="1065">1065</option>
+                <option value="1120S">1120S</option>
+                <option value="1120">1120</option>
+                <option value="Bookkeeping">Bookkeeping</option>
+                <option value="Tax Projection">Tax Projection</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceTaxYear">Tax Year</label>
+            <div class="engagement-control-stack">
+              <select id="invoiceTaxYear">
+                <option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option>
+                <option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option>
+                <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceNumber">Invoice Number</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceNumber" type="text" autocomplete="off" placeholder="INV-2026-0001" />
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceDate">Invoice Date</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceDate" type="date" />
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceDueDate">Due Date</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceDueDate" type="date" />
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceFeeType">Fee Arrangement</label>
+            <div class="engagement-control-stack">
+              <select id="invoiceFeeType">
+                <option value="Flat Fee">Flat Fee</option>
+                <option value="Hourly Rate">Hourly Rate</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="invoiceHoursRow" class="engagement-rebuilt-row hidden">
+            <label for="invoiceHours">Hours</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceHours" type="number" min="0.01" step="0.25" inputmode="decimal" placeholder="1.00" />
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label id="invoiceFeeLabel" for="invoiceFeeValue">Flat Fee (USD $)</label>
+            <div class="engagement-control-stack">
+              <div class="engagement-money-input">
+                <span aria-hidden="true">$</span>
+                <input id="invoiceFeeValue" type="text" inputmode="decimal" autocomplete="off" placeholder="1,500.00" aria-label="Invoice fee in US dollars" />
+              </div>
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceDescription">Description</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceDescription" type="text" autocomplete="off" placeholder="Optional description shown on the invoice" />
+            </div>
+          </div>
+
+          <div class="engagement-rebuilt-row">
+            <label for="invoiceNotes">Invoice Note</label>
+            <div class="engagement-control-stack">
+              <input id="invoiceNotes" type="text" autocomplete="off" placeholder="Thank you for your business." />
+            </div>
+          </div>
+        </section>
+
+        <section class="engagement-letter-preview-panel engagement-rebuilt-preview-panel" aria-label="Invoice preview">
+          <div class="engagement-preview-heading">
+            <div>
+              <span>INVOICE PREVIEW</span>
+              <strong id="invoicePreviewClient">Select a client</strong>
+            </div>
+            <span id="invoicePreviewService" class="engagement-service-pill">Service</span>
+          </div>
+          <article id="invoicePreview" class="engagement-preview engagement-rebuilt-preview invoice-preview"></article>
+        </section>
+
+        <section class="engagement-bottom-generate" aria-label="Generate invoice">
+          <div class="engagement-bottom-generate-copy">
+            <strong>Generate Invoice</strong>
+            <span>Create the finished invoice using the client, service, dates, preparer, and billing information shown above.</span>
+          </div>
+          <div class="engagement-bottom-generate-buttons">
+            <button id="invoiceGenerateWord" class="primary engagement-generate-button" type="button">Generate MS Word Document</button>
+            <button id="invoiceGeneratePDF" class="primary engagement-generate-button" type="button">Generate PDF Document</button>
+          </div>
+        </section>
+        </div>
+
+      </div>
+
+      <div class="modal-actions engagement-letter-actions">
+        <button id="invoiceClose" class="secondary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="taxCalculatorBackdrop" class="modal-backdrop hidden">
+    <div class="modal tax-calculator-modal" role="dialog" aria-modal="true" aria-labelledby="taxCalculatorTitle">
+      <div class="tax-calculator-heading">
+        <div>
+          <span id="taxCalculatorEyebrow" class="auth-eyebrow">TOOLS • TAX YEAR 2025</span>
+          <h2 id="taxCalculatorTitle">2025 Federal Tax Calculator</h2>
+          <p id="taxCalculatorDescription">Estimate 2025 federal income tax using the standard deduction, 2025 tax brackets, capital-gain rates, and self-employment tax rules.</p>
+        </div>
+        <button id="taxCalculatorCloseTop" class="secondary" type="button">Close</button>
+      </div>
+
+      <div class="tax-calculator-scroll">
+        <div class="tax-calculator-notice">
+          <strong>Estimate only.</strong> This calculator is designed for quick planning. It now estimates the Child Tax Credit, the earned-income method of the Additional Child Tax Credit, and equal quarterly estimated-tax installments after expected federal withholding. It does not calculate the prior-year safe-harbor method, annualized-income installments, or other credits, itemized deductions, QBI, AMT, NIIT, foreign tax items, dependent/age/blind standard-deduction adjustments, or special deductions for tips, overtime, seniors, or auto-loan interest.
+        </div>
+
+        <section class="tax-calculator-section">
+          <h3>Tax year and filing status</h3>
+          <div class="tax-input-grid">
+            <label class="tax-field">
+              <span>Tax year</span>
+              <select id="taxYear">
+                <option value="2025" selected>2025</option>
+                <option value="2026">2026</option>
+              </select>
+              <small>Choose the tax year before calculating.</small>
+            </label>
+            <label class="tax-field">
+              <span>Filing status / marital status</span>
+              <select id="taxFilingStatus">
+                <option value="single">Single</option>
+                <option value="mfj">Married filing jointly</option>
+                <option value="mfs">Married filing separately</option>
+                <option value="hoh">Head of household</option>
+                <option value="qss">Qualifying surviving spouse</option>
+              </select>
+              <small>For a joint return, enter combined amounts for both spouses.</small>
+            </label>
+          </div>
+        </section>
+
+        <section class="tax-calculator-section">
+          <h3 id="taxIncomeHeading">2025 income</h3>
+          <div class="tax-input-grid">
+            <label class="tax-field">
+              <span>Wages</span>
+              <div class="money-input"><span>$</span><input id="taxWages" inputmode="decimal" value="0" /></div>
+              <small>Assumed to also be Social Security wages for this estimate.</small>
+            </label>
+            <label class="tax-field">
+              <span>Self-employment income</span>
+              <div class="money-input"><span>$</span><input id="taxSelfEmployment" inputmode="decimal" value="0" /></div>
+              <small>Enter net Schedule C/F self-employment profit or loss.</small>
+            </label>
+            <label class="tax-field">
+              <span>Taxable interest income</span>
+              <div class="money-input"><span>$</span><input id="taxInterest" inputmode="decimal" value="0" /></div>
+            </label>
+            <label class="tax-field">
+              <span>Short-term capital gain / (loss)</span>
+              <div class="money-input"><span>$</span><input id="taxShortCapital" inputmode="decimal" value="0" /></div>
+              <small>Short-term net gains are taxed at ordinary rates.</small>
+            </label>
+            <label class="tax-field">
+              <span>Long-term capital gain / (loss)</span>
+              <div class="money-input"><span>$</span><input id="taxLongCapital" inputmode="decimal" value="0" /></div>
+              <small>Most net long-term gains use the 0% / 15% / 20% rates.</small>
+            </label>
+            <label class="tax-field">
+              <span>Expected federal income tax withholding</span>
+              <div class="money-input"><span>$</span><input id="taxFederalWithholding" inputmode="decimal" value="0" /></div>
+              <small>Enter total federal income tax expected to be withheld for the year. This is used only to estimate the remaining quarterly payments.</small>
+            </label>
+          </div>
+          <p class="tax-negative-hint">Use a minus sign for losses, for example <strong>-5000</strong>.</p>
+        </section>
+
+        <section class="tax-calculator-section">
+          <h3>Child Tax Credit</h3>
+          <div class="tax-input-grid">
+            <label class="tax-field tax-field-wide">
+              <span>Qualifying children under age 17</span>
+              <input id="taxQualifyingChildren" type="number" min="0" step="1" value="0" inputmode="numeric" />
+              <small>Enter children who meet the Child Tax Credit rules, including the required Social Security number rules. BabyFileCab assumes the taxpayer otherwise qualifies.</small>
+            </label>
+          </div>
+          <p class="tax-negative-hint">For both 2025 and 2026, the maximum CTC is <strong>$2,200 per qualifying child</strong>, with up to <strong>$1,700 per child</strong> potentially refundable as the Additional Child Tax Credit. The credit begins phasing out above $400,000 for married filing jointly and $200,000 for other filing statuses.</p>
+        </section>
+
+        <div class="tax-calculator-button-row">
+          <button id="taxCalculatorReset" class="secondary" type="button">Reset</button>
+          <button id="taxCalculatorCalculate" class="primary" type="button">Calculate 2025 Estimate</button>
+        </div>
+
+        <section id="taxCalculatorResults" class="tax-results hidden" aria-live="polite">
+          <div class="tax-result-hero">
+            <span id="taxResultYearLabel">Estimated 2025 federal tax</span>
+            <strong id="taxResultTotal">$0</strong>
+            <small>Income tax after estimated CTC + self-employment tax + estimated Additional Medicare Tax − estimated refundable ACTC. Withholding is shown separately below and is used to estimate the remaining quarterly payments.</small>
+          </div>
+
+          <div class="tax-result-cards">
+            <div class="tax-result-card"><span>Adjusted gross income</span><strong id="taxResultAGI">$0</strong></div>
+            <div class="tax-result-card"><span>Standard deduction</span><strong id="taxResultStandardDeduction">$0</strong></div>
+            <div class="tax-result-card"><span>Taxable income</span><strong id="taxResultTaxableIncome">$0</strong></div>
+            <div class="tax-result-card"><span>Marginal ordinary bracket</span><strong id="taxResultMarginalRate">0%</strong></div>
+          </div>
+
+          <div class="tax-breakdown">
+            <h3>Tax breakdown</h3>
+            <div class="tax-breakdown-row"><span>Ordinary income tax</span><strong id="taxResultOrdinaryTax">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Long-term capital gains tax</span><strong id="taxResultCapitalTax">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Income tax before credits</span><strong id="taxResultIncomeTaxBeforeCredits">$0</strong></div>
+            <div class="tax-breakdown-row tax-breakdown-muted"><span>Maximum Child Tax Credit before phaseout</span><strong id="taxResultCTCMaximum">$0</strong></div>
+            <div class="tax-breakdown-row tax-breakdown-muted"><span>CTC phaseout reduction</span><strong id="taxResultCTCPhaseout">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Child Tax Credit used (nonrefundable)</span><strong id="taxResultCTC">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Income tax after Child Tax Credit</span><strong id="taxResultIncomeTaxAfterCTC">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Self-employment tax</span><strong id="taxResultSETax">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Additional Medicare Tax</span><strong id="taxResultAdditionalMedicare">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Additional Child Tax Credit (refundable estimate)</span><strong id="taxResultACTC">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Expected federal income tax withholding</span><strong id="taxResultFederalWithholding">$0</strong></div>
+            <div class="tax-breakdown-row"><span>Projected tax remaining after withholding</span><strong id="taxResultEstimatedTaxToCover">$0</strong></div>
+            <div class="tax-breakdown-row tax-breakdown-muted"><span>Deduction for ½ of self-employment tax</span><strong id="taxResultHalfSE">$0</strong></div>
+            <div class="tax-breakdown-row tax-breakdown-muted"><span>Capital loss deduction used</span><strong id="taxResultCapitalLossDeduction">$0</strong></div>
+            <div class="tax-breakdown-row tax-breakdown-muted"><span>Estimated unused capital loss</span><strong id="taxResultCapitalLossCarryforward">$0</strong></div>
+          </div>
+
+          <div class="tax-capital-detail">
+            <h3>Long-term capital gain rate detail</h3>
+            <div class="tax-rate-pills">
+              <div><span>0% portion</span><strong id="taxResultCG0">$0</strong></div>
+              <div><span>15% portion</span><strong id="taxResultCG15">$0</strong></div>
+              <div><span>20% portion</span><strong id="taxResultCG20">$0</strong></div>
+            </div>
+          </div>
+
+          <div class="tax-quarterly-detail">
+            <div class="tax-quarterly-heading">
+              <div>
+                <h3>Estimated quarterly payments</h3>
+                <p>Equal-installment planning estimate based on projected federal tax less expected federal withholding.</p>
+              </div>
+              <div class="tax-quarterly-total">
+                <span>Estimated amount each quarter</span>
+                <strong id="taxResultQuarterlyPayment">$0</strong>
+              </div>
+            </div>
+            <div class="tax-quarterly-grid">
+              <div class="tax-quarter-card"><span>1st payment</span><strong id="taxQuarter1Amount">$0</strong><small id="taxQuarter1Date">April 15, 2025</small></div>
+              <div class="tax-quarter-card"><span>2nd payment</span><strong id="taxQuarter2Amount">$0</strong><small id="taxQuarter2Date">June 16, 2025</small></div>
+              <div class="tax-quarter-card"><span>3rd payment</span><strong id="taxQuarter3Amount">$0</strong><small id="taxQuarter3Date">September 15, 2025</small></div>
+              <div class="tax-quarter-card"><span>4th payment</span><strong id="taxQuarter4Amount">$0</strong><small id="taxQuarter4Date">January 15, 2026</small></div>
+            </div>
+            <div class="tax-quarterly-note">
+              <p><strong>Planning note:</strong> These are four equal installments of the projected tax remaining after withholding. The actual amount required to avoid an underpayment penalty can differ under Form 1040-ES because of prior-year safe-harbor rules, the timing of income, withholding, credits, or the annualized-income method.</p>
+              <button id="taxIRSPaymentButton" class="primary" type="button">Pay Federal Tax on IRS.gov</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="tax-sources">
+          <strong id="taxSourcesTitle">IRS references used for this 2025 calculator</strong>
+          <span id="taxSourcesText">Federal income tax rates and brackets • Publication 17 (2025) • IRS Schedule 8812 / Child Tax Credit guidance • Topic No. 409, Capital Gains and Losses • 2025 Schedule SE guidance.</span>
+          <span id="taxSourcesNote" class="tax-source-note">Standard deduction: $15,750 Single/MFS; $31,500 MFJ/QSS; $23,625 Head of Household. Child Tax Credit: up to $2,200 per qualifying child, with up to $1,700 potentially refundable through the ACTC. Social Security wage base used for SE tax: $176,100.</span>
+        </div>
+      </div>
+
+      <div class="modal-actions tax-calculator-footer">
+        <button id="taxCalculatorClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="currencyConverterBackdrop" class="modal-backdrop hidden">
+    <div class="modal currency-converter-modal" role="dialog" aria-modal="true" aria-labelledby="currencyConverterTitle">
+      <div class="currency-converter-heading">
+        <div>
+          <span class="auth-eyebrow">TOOLS • IRS YEARLY AVERAGE RATES</span>
+          <h2 id="currencyConverterTitle">USD Currency Converter</h2>
+          <p>Convert between U.S. dollars and currencies listed in the IRS yearly-average exchange-rate table.</p>
+        </div>
+        <button id="currencyConverterCloseTop" class="secondary" type="button">Close</button>
+      </div>
+
+      <div class="currency-converter-scroll">
+        <div class="currency-converter-notice">
+          <strong>Tax-use note.</strong> The IRS states that it has no official exchange rate and generally accepts a posted exchange rate used consistently. For a specific transaction, the spot rate that applies when the item is received, paid, or accrued may be appropriate. This tool uses only the IRS yearly-average table shown on the referenced IRS page.
+        </div>
+
+        <div class="currency-converter-grid">
+          <label class="currency-converter-field">
+            <span>Rate year</span>
+            <select id="currencyConverterYear">
+              <option value="2025" selected>2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+            </select>
+            <small>2026 is not included because the IRS has not published a completed 2026 yearly-average table yet.</small>
+          </label>
+
+          <label class="currency-converter-field">
+            <span>Conversion direction</span>
+            <select id="currencyConverterDirection">
+              <option value="foreign-to-usd" selected>Foreign currency → U.S. dollars</option>
+              <option value="usd-to-foreign">U.S. dollars → Foreign currency</option>
+            </select>
+          </label>
+
+          <label class="currency-converter-field currency-converter-field-wide">
+            <span>Currency</span>
+            <select id="currencyConverterCurrency"></select>
+            <small id="currencyConverterRateHint">Select a currency to view its IRS yearly-average rate.</small>
+          </label>
+
+          <label class="currency-converter-field currency-converter-field-wide">
+            <span id="currencyConverterAmountLabel">Foreign-currency amount</span>
+            <input id="currencyConverterAmount" inputmode="decimal" value="0.00" autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="currency-converter-actions">
+          <button id="currencyConverterReset" class="secondary" type="button">Reset</button>
+          <button id="currencyConverterCalculate" class="primary" type="button">Convert</button>
+        </div>
+
+        <section id="currencyConverterResults" class="currency-converter-results" aria-live="polite">
+          <span id="currencyConverterResultLabel">Converted amount</span>
+          <strong id="currencyConverterResult">$0.00</strong>
+          <div class="currency-converter-rate-row">
+            <span>IRS yearly-average rate</span>
+            <strong id="currencyConverterRateDisplay">—</strong>
+          </div>
+          <p id="currencyConverterFormula">Choose a currency and enter an amount.</p>
+        </section>
+
+        <div class="currency-converter-source">
+          <div>
+            <strong>IRS source</strong>
+            <p>Yearly average currency exchange rates — Internal Revenue Service</p>
+          </div>
+          <button id="currencyConverterOpenIRS" class="secondary" type="button">Open IRS Rate Table</button>
+        </div>
+      </div>
+
+      <div class="modal-actions currency-converter-footer">
+        <button id="currencyConverterClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="firmCalendarBackdrop" class="modal-backdrop hidden">
+    <div class="modal firm-calendar-modal" role="dialog" aria-modal="true" aria-labelledby="firmCalendarTitle">
+      <div class="firm-calendar-heading">
+        <div>
+          <span class="auth-eyebrow">TOOLS • FIRM WORKFLOW</span>
+          <h2 id="firmCalendarTitle">2026 Firm Calendar</h2>
+          <p>Assign one or more clients to each workday, move week by week, and open a client's documents directly from the schedule.</p>
+        </div>
+        <div class="firm-calendar-heading-actions">
+          <div class="firm-calendar-preparer-picker">
+            <button id="firmCalendarPreparerButton" type="button" class="secondary" aria-expanded="false" aria-controls="firmCalendarPreparerMenu">Preparers ▾</button>
+            <div id="firmCalendarPreparerMenu" class="hidden" role="menu"></div>
+          </div>
+          <button id="firmCalendarCloseTop" class="secondary" type="button">Close</button>
+        </div>
+      </div>
+
+      <div class="firm-calendar-body">
+        <div class="firm-calendar-controls">
+          <button id="firmCalendarPrevWeek" class="secondary firm-calendar-arrow" type="button" title="Previous week">←</button>
+          <label class="firm-calendar-week-picker">
+            <span>Week of 2026</span>
+            <select id="firmCalendarWeekSelect" aria-label="Choose week of 2026"></select>
+          </label>
+          <button id="firmCalendarNextWeek" class="secondary firm-calendar-arrow" type="button" title="Next week">→</button>
+          <button id="firmCalendarCurrentWeek" class="secondary" type="button">Current Week</button>
+        </div>
+
+        <div class="firm-calendar-search">
+          <label for="firmCalendarSearch">Search all clients and scheduled assignments</label>
+          <div class="firm-calendar-search-controls"><input id="firmCalendarSearch" type="search" placeholder="Search any client by name or ID…" autocomplete="off" /><button id="firmCalendarSearchClear" type="button" class="secondary">Clear</button></div>
+          <div id="firmCalendarSearchResults" class="firm-calendar-search-results hidden" aria-live="polite"></div>
+        </div>
+
+        <div class="firm-calendar-layout">
+          <section class="firm-calendar-week-panel" aria-label="Weekly firm calendar">
+            <div id="firmCalendarWeekLabel" class="firm-calendar-week-label"></div>
+            <div id="firmCalendarGrid" class="firm-calendar-grid"></div>
+          </section>
+
+          <aside class="firm-calendar-client-panel" aria-label="Scheduled client documents">
+            <div id="firmCalendarClientEmpty" class="firm-calendar-client-empty">
+              <div class="empty-icon">🗂️</div>
+              <h3>Client Documents</h3>
+              <p>Click a client name on the calendar to see that client's Permanent Folder and documents organized by tax year.</p>
+            </div>
+            <div id="firmCalendarClientDetail" class="hidden">
+              <div class="firm-calendar-client-heading">
+                <div>
+                  <span class="firm-calendar-detail-label">Scheduled client</span>
+                  <h3 id="firmCalendarClientName"></h3>
+                  <p id="firmCalendarClientMeta"></p>
+                </div>
+                <button id="firmCalendarOpenClient" class="secondary" type="button">Open Client in Work Space</button>
+              </div>
+              <div id="firmCalendarClientDocuments" class="firm-calendar-documents"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="modal-actions firm-calendar-footer">
+        <span id="firmCalendarStatus" class="firm-calendar-status">Assignments are shared with users in this local company workspace.</span>
+        <button id="firmCalendarClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="calendarScheduleClientBackdrop" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="calendarScheduleClientTitle">
+      <h2 id="calendarScheduleClientTitle">Assign Client to Calendar</h2>
+      <p id="calendarScheduleClientName"></p>
+      <label for="calendarScheduleClientDate">Assignment date</label>
+      <input id="calendarScheduleClientDate" type="date" min="2026-01-01" max="2026-12-31" />
+      <label for="calendarScheduleClientPreparer">Tax preparer</label>
+      <select id="calendarScheduleClientPreparer"></select>
+      <div class="modal-actions"><button id="calendarScheduleClientCancel" type="button" class="secondary">Cancel</button><button id="calendarScheduleClientSave" type="button" class="primary">Assign</button></div>
+    </div>
+  </div>
+
+  <div id="firmCalendarPreparerReassignBackdrop" class="modal-backdrop hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="firmCalendarPreparerReassignTitle">
+      <h2 id="firmCalendarPreparerReassignTitle">Reassign To Preparer</h2>
+      <p id="firmCalendarPreparerReassignClient"></p>
+      <label for="firmCalendarPreparerReassignSelect">Tax preparer</label>
+      <select id="firmCalendarPreparerReassignSelect"></select>
+      <div class="modal-actions"><button id="firmCalendarPreparerReassignCancel" type="button" class="secondary">Cancel</button><button id="firmCalendarPreparerReassignSave" type="button" class="primary">Reassign</button></div>
+    </div>
+  </div>
+
+  <div id="firmCalendarReassignBackdrop" class="modal-backdrop hidden">
+    <div class="modal firm-calendar-reassign-modal" role="dialog" aria-modal="true" aria-labelledby="firmCalendarReassignTitle">
+      <div class="firm-calendar-heading">
+        <div>
+          <span class="auth-eyebrow">FIRM CALENDAR</span>
+          <h2 id="firmCalendarReassignTitle">Reassign Client</h2>
+          <p>Move this client to another date in the 2026 firm schedule.</p>
+        </div>
+        <button id="firmCalendarReassignCloseTop" class="secondary" type="button">Close</button>
+      </div>
+      <div class="firm-calendar-reassign-summary">
+        <div><span>Client</span><strong id="firmCalendarReassignClient"></strong></div>
+        <div><span>Current date</span><strong id="firmCalendarReassignCurrent"></strong></div>
+      </div>
+      <label class="form-field firm-calendar-reassign-field">
+        <span>New date</span>
+        <input id="firmCalendarReassignDate" type="date" min="2026-01-01" max="2026-12-31" />
+      </label>
+      <div class="modal-actions">
+        <button id="firmCalendarReassignCancel" class="secondary" type="button">Cancel</button>
+        <button id="firmCalendarReassignSave" class="primary" type="button">Move Client</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appAuditBackdrop" class="modal-backdrop hidden">
+    <div class="modal app-audit-modal" role="dialog" aria-modal="true" aria-labelledby="appAuditTitle">
+      <div class="app-audit-heading">
+        <div>
+          <span class="auth-eyebrow">TOOLS • SECURITY &amp; HISTORY</span>
+          <h2 id="appAuditTitle">BabyFileCab Audit Trail</h2>
+          <p>Company-wide activity history showing who did what, when it happened, and the affected client when available.</p>
+        </div>
+        <button id="appAuditCloseTop" class="secondary" type="button">Close</button>
+      </div>
+      <div class="app-audit-controls">
+        <label class="app-audit-search">
+          <span>Search audit history</span>
+          <input id="appAuditSearch" class="modal-input compact" type="search" placeholder="User, client, action, or details…" autocomplete="off" />
+        </label>
+        <button id="appAuditRefresh" class="secondary" type="button">↻ Refresh</button>
+      </div>
+      <div class="app-audit-table-wrap">
+        <table class="app-audit-table">
+          <thead><tr><th>Date / Time</th><th>User</th><th>Client</th><th>Action</th><th>Details</th></tr></thead>
+          <tbody id="appAuditBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-actions app-audit-footer">
+        <span id="appAuditStatus" class="app-audit-status">0 audit entries</span>
+        <button id="appAuditClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="aboutBackdrop" class="modal-backdrop hidden">
+    <div class="modal about-modal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <div class="manual-heading-row">
+        <div>
+          <span class="auth-eyebrow">ABOUT</span>
+          <h2 id="aboutTitle">About BabyFileCab</h2>
+          <p>A local-first document management system built for tax and accounting work.</p>
+        </div>
+        <button id="aboutCloseTop" class="secondary" type="button">Close</button>
+      </div>
+      <div class="about-content">
+        <p><strong>BabyFileCab</strong> is designed to give tax preparers, accountants, bookkeepers, enrolled agents, CPAs, and small accounting firms a simple place to organize client records without forcing their day-to-day document workflow into a cloud service.</p>
+        <p>The application organizes each client into a clear Work Space with a Permanent Folder, client notes, tax years, custom sections, document descriptions, previews, search tools, communications information, and local user accounts.</p>
+        <h3>Designed for accounting offices</h3>
+        <p>BabyFileCab is intended for professionals who regularly work with tax returns, source documents, workpapers, engagement records, correspondence, bookkeeping files, PDFs, spreadsheets, Word documents, images, CSV files, and other client records.</p>
+        <h3>Local-first by design</h3>
+        <p>The current BabyFileCab design keeps company workspaces, client folders, account information, and documents on the local computer. Users belonging to the same local company workspace can see the same clients and documents. Optional network or cloud sharing can be added later without changing the local-first purpose of the application.</p>
+        <h3>Goal</h3>
+        <p>The goal of BabyFileCab is to make client filing fast and understandable: find the client, choose the year or section, upload the document, preview it, and get back to the accounting work.</p>
+      </div>
+      <div class="modal-actions">
+        <button id="aboutClose" class="primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
