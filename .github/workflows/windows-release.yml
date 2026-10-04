@@ -1,0 +1,74 @@
+name: Build Windows Download
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "New release tag, for example go-v2.0.0"
+        required: true
+        default: "go-v2.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Download source code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Test frontend
+        run: node --test frontend/tests/*.test.cjs
+
+      - name: Test Go code
+        run: go test ./...
+
+      - name: Install matching Wails CLI
+        shell: pwsh
+        run: |
+          $version = go list -m -f '{{.Version}}' github.com/wailsapp/wails/v2
+          go install "github.com/wailsapp/wails/v2/cmd/wails@$version"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "$(go env GOPATH)\bin" >> $env:GITHUB_PATH
+
+      - name: Build Windows application
+        run: wails build -platform windows/amd64 -o BabyFileCab.exe -webview2 download
+
+      - name: Package Windows download
+        shell: pwsh
+        run: |
+          if (!(Test-Path build/bin/BabyFileCab.exe)) {
+            throw "Windows executable was not generated."
+          }
+          Compress-Archive -Path build/bin/BabyFileCab.exe -DestinationPath BabyFileCab-Windows-x64.zip
+          $hash = (Get-FileHash BabyFileCab-Windows-x64.zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  BabyFileCab-Windows-x64.zip" | Set-Content SHA256SUMS.txt
+          "BabyFileCab for Windows x64. Extract the ZIP and double-click BabyFileCab.exe. This build is unsigned and requires Microsoft Edge WebView2 Runtime; the app may offer to download it. Test on Windows before publishing." | Set-Content release-notes.txt
+
+      - name: Save build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: BabyFileCab-Windows-x64
+          path: |
+            BabyFileCab-Windows-x64.zip
+            SHA256SUMS.txt
+
+      - name: Create draft GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          gh release create "$env:RELEASE_TAG" BabyFileCab-Windows-x64.zip SHA256SUMS.txt --draft --target "$env:GITHUB_SHA" --title "BabyFileCab Go Wails — Windows x64" --notes-file release-notes.txt
