@@ -1,8 +1,0 @@
-pypdfium2
-pypdf
-Pillow
-openpyxl
-reportlab
-python-docx
-cryptography
-argon2-cffi

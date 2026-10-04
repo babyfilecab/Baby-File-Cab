@@ -1,0 +1,14 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "BabyFileCab",
+  "outputfilename": "BabyFileCab",
+  "frontend:dir": "frontend",
+  "assetdir": "frontend/dist",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:build": "",
+  "frontend:dev:watcher": "",
+  "wailsjsdir": "frontend/wailsjs",
+  "version": "2",
+  "build:tags": "webkit2_41"
+}
