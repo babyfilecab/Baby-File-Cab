@@ -15,6 +15,7 @@ import (
 func TestEncryptedCompanyEnrollmentAndBackup(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	a, err := NewApp()
 	if err != nil {
 		t.Fatal(err)
@@ -185,6 +186,7 @@ func TestInterruptedMigrationResumesWithoutPlaintext(t *testing.T) {
 func TestLegacyCompanyRequiresUserEnrollment(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	root := filepath.Join(home, "BabyFileCabData")
 	client := filepath.Join(root, "00001 - Existing Client")
 	if err := os.MkdirAll(filepath.Join(client, permanentFolder), 0700); err != nil {
@@ -204,27 +206,15 @@ func TestLegacyCompanyRequiresUserEnrollment(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := a.Login("admin", "legacy-admin-pass"); err != nil {
-		t.Fatal("legacy migration", err)
+	// Existing accounts without key wrappers must fail closed, including legacy
+	// administrators. Login must not bootstrap a replacement vault key.
+	for _, credentials := range [][2]string{{"admin", "legacy-admin-pass"}, {"staff", "legacy-staff-pass"}} {
+		if _, err := a.Login(credentials[0], credentials[1]); err == nil || !strings.Contains(err.Error(), "no replacement key") {
+			t.Fatal("legacy login did not fail closed", credentials[0], err)
+		}
 	}
-	if got, err := a.GetNotes(client); err != nil || got != "legacy secret" {
-		t.Fatal("legacy note", err)
+	raw, err := os.ReadFile(filepath.Join(client, permanentFolder, notesFile))
+	if err != nil || string(raw) != "legacy secret" {
+		t.Fatal("failed login changed legacy notes", err)
 	}
-	if _, err := a.Login("staff", "legacy-staff-pass"); err == nil || !strings.Contains(err.Error(), "pending") {
-		t.Fatal("legacy staff accessed vault without enrollment", err)
-	}
-	if err := a.EnrollExistingUser("staff", "wrong"); err == nil {
-		t.Fatal("wrong staff password enrolled")
-	}
-	if err := a.EnrollExistingUser("staff", "legacy-staff-pass"); err != nil {
-		t.Fatal("enrollment", err)
-	}
-	a.Logout()
-	if _, err := a.Login("staff", "legacy-staff-pass"); err != nil {
-		t.Fatal("staff after enrollment", err)
-	}
-	if got, err := a.GetNotes(client); err != nil || got != "legacy secret" {
-		t.Fatal("staff legacy access", err)
-	}
-	a.Logout()
 }

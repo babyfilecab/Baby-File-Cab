@@ -70,17 +70,17 @@ type App struct {
 	storageRoot string
 	dataRoot    string
 
-	authMu         sync.RWMutex
-	currentUser    *UserProfile
-	currentCompany *CompanyProfile
-	vaultKey       []byte
-	vaultMu        sync.RWMutex
-	lastActivity   time.Time
+	authMu          sync.RWMutex
+	currentUser     *UserProfile
+	currentCompany  *CompanyProfile
+	vaultKey        []byte
+	vaultMu         sync.RWMutex
+	lastActivity    time.Time
 	autoLockMinutes int
-	calendarMu     sync.Mutex
-	auditMu        sync.Mutex
-	tempMu         sync.Mutex
-	tempDirs       map[string]struct{}
+	calendarMu      sync.Mutex
+	auditMu         sync.Mutex
+	tempMu          sync.Mutex
+	tempDirs        map[string]struct{}
 }
 
 const (
@@ -168,7 +168,7 @@ type storedUser struct {
 	PasswordHash string `json:"passwordHash"`
 	Iterations   int    `json:"iterations"`
 	PasswordKDF  string `json:"passwordKdf,omitempty"`
-	KeyWrapID string `json:"keyWrapId,omitempty"`
+	KeyWrapID    string `json:"keyWrapId,omitempty"`
 }
 
 type TreeNode struct {
@@ -200,22 +200,22 @@ type ClientProfile struct {
 }
 
 type FirmCalendarAssignment struct {
-	Date       string `json:"date"`
-	ClientID   string `json:"clientId"`
-	ClientName string `json:"clientName"`
-	ClientPath string `json:"clientPath,omitempty"`
-	ReturnType string `json:"returnType,omitempty"`
- Status string `json:"status,omitempty"`
- PreparerUsername string `json:"preparerUsername,omitempty"`
+	Date             string `json:"date"`
+	ClientID         string `json:"clientId"`
+	ClientName       string `json:"clientName"`
+	ClientPath       string `json:"clientPath,omitempty"`
+	ReturnType       string `json:"returnType,omitempty"`
+	Status           string `json:"status,omitempty"`
+	PreparerUsername string `json:"preparerUsername,omitempty"`
 }
 
 type storedFirmCalendarAssignment struct {
-	Date       string `json:"date"`
-	ClientID   string `json:"clientId"`
-	ClientName string `json:"clientName"`
-	ReturnType string `json:"returnType,omitempty"`
- Status string `json:"status,omitempty"`
- PreparerUsername string `json:"preparerUsername,omitempty"`
+	Date             string `json:"date"`
+	ClientID         string `json:"clientId"`
+	ClientName       string `json:"clientName"`
+	ReturnType       string `json:"returnType,omitempty"`
+	Status           string `json:"status,omitempty"`
+	PreparerUsername string `json:"preparerUsername,omitempty"`
 }
 
 type ClientCommunication struct {
@@ -464,12 +464,12 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 	app := &App{storageRoot: root, dataRoot: root, autoLockMinutes: 15}
- if data, err := os.ReadFile(filepath.Join(root, ".autolock-minutes")); err == nil {
-  var minutes int
-  if json.Unmarshal(data, &minutes) == nil && validAutoLockMinutes(minutes) {
-   app.autoLockMinutes = minutes
-  }
- }
+	if data, err := os.ReadFile(filepath.Join(root, ".autolock-minutes")); err == nil {
+		var minutes int
+		if json.Unmarshal(data, &minutes) == nil && validAutoLockMinutes(minutes) {
+			app.autoLockMinutes = minutes
+		}
+	}
 	if err := os.RemoveAll(filepath.Join(root, ".plaintext-preview")); err != nil {
 		return nil, err
 	}
@@ -487,35 +487,43 @@ func NewApp() (*App, error) {
 }
 
 func validAutoLockMinutes(minutes int) bool {
- return minutes == 15 || minutes == 30 || minutes == 45
+	return minutes == 15 || minutes == 30 || minutes == 45
 }
 
 // Caller holds authMu for reading or writing.
 func (a *App) idleTimeoutLocked() time.Duration {
- minutes := a.autoLockMinutes
- if !validAutoLockMinutes(minutes) { minutes = 15 }
- return time.Duration(minutes) * time.Minute
+	minutes := a.autoLockMinutes
+	if !validAutoLockMinutes(minutes) {
+		minutes = 15
+	}
+	return time.Duration(minutes) * time.Minute
 }
 
 func (a *App) GetAutoLockMinutes() int {
- a.authMu.RLock()
- defer a.authMu.RUnlock()
- return int(a.idleTimeoutLocked() / time.Minute)
+	a.authMu.RLock()
+	defer a.authMu.RUnlock()
+	return int(a.idleTimeoutLocked() / time.Minute)
 }
 
 func (a *App) SetAutoLockMinutes(minutes int) error {
- a.authMu.Lock()
- defer a.authMu.Unlock()
- if !validAutoLockMinutes(minutes) { return errors.New("choose 15, 30, or 45 minutes") }
- if a.currentUser == nil || time.Since(a.lastActivity) >= a.idleTimeoutLocked() {
-  return errors.New("sign in to BabyFileCab first")
- }
- data, err := json.Marshal(minutes)
- if err != nil { return err }
- if err := writeAtomicPrivate(filepath.Join(a.storageRoot, ".autolock-minutes"), data); err != nil { return err }
- a.autoLockMinutes = minutes
- a.lastActivity = time.Now()
- return nil
+	a.authMu.Lock()
+	defer a.authMu.Unlock()
+	if !validAutoLockMinutes(minutes) {
+		return errors.New("choose 15, 30, or 45 minutes")
+	}
+	if a.currentUser == nil || time.Since(a.lastActivity) >= a.idleTimeoutLocked() {
+		return errors.New("sign in to BabyFileCab first")
+	}
+	data, err := json.Marshal(minutes)
+	if err != nil {
+		return err
+	}
+	if err := writeAtomicPrivate(filepath.Join(a.storageRoot, ".autolock-minutes"), data); err != nil {
+		return err
+	}
+	a.autoLockMinutes = minutes
+	a.lastActivity = time.Now()
+	return nil
 }
 
 func (a *App) startup(ctx context.Context) {
@@ -589,7 +597,9 @@ func (a *App) ListCompanyUsers() ([]UserProfile, error) {
 		}
 		profile.CompanyName = a.currentCompany.Name
 		keyPath, err := a.activeWrappedKeyPath(a.currentCompany.ID, u.Username)
-		if err != nil { return nil, err }
+		if err != nil {
+			return nil, err
+		}
 		if _, err := os.Stat(keyPath); err == nil {
 			profile.VaultStatus = "Enrolled"
 		} else {
@@ -874,11 +884,11 @@ func (a *App) Login(username, password string) (UserProfile, error) {
 		}
 		vaultKey, keyErr := a.unwrapKey(company.ID, u.Username, password)
 		if keyErr != nil {
-            if errors.Is(keyErr, os.ErrNotExist) {
-                return UserProfile{}, errors.New("company vault key is missing: restore the encrypted key file from a complete backup, or ask an administrator who can already unlock this company to enroll your account; no replacement key was created")
-            }
-            return UserProfile{}, keyErr
-        }
+			if errors.Is(keyErr, os.ErrNotExist) {
+				return UserProfile{}, errors.New("company vault key is missing: restore the encrypted key file from a complete backup, or ask an administrator who can already unlock this company to enroll your account; no replacement key was created")
+			}
+			return UserProfile{}, keyErr
+		}
 
 		if u.PasswordKDF == "" {
 			// Upgrade only after a successful legacy password check. An interrupted
@@ -991,7 +1001,9 @@ func (a *App) EnrollExistingUser(username, password string) error {
 		if user.CompanyID != a.currentCompany.ID || !strings.EqualFold(user.Username, strings.TrimSpace(username)) {
 			continue
 		}
-		if user.KeyWrapID != "" { return errors.New("user is already enrolled; restore the encrypted vault-key file if it is missing") }
+		if user.KeyWrapID != "" {
+			return errors.New("user is already enrolled; restore the encrypted vault-key file if it is missing")
+		}
 		if _, err := os.Stat(a.wrappedKeyPath(user.CompanyID, user.Username)); err == nil {
 			return errors.New("user is already enrolled")
 		} else if !errors.Is(err, os.ErrNotExist) {
@@ -1063,11 +1075,10 @@ func (a *App) saveUsersUnlocked(users []storedUser) error {
 	if err != nil {
 		return fmt.Errorf("save users: %w", err)
 	}
-	if err := writeAtomicPrivate(a.usersPath(), data); err != nil { return err }
-	dir, err := os.Open(a.storageRoot)
-	if err != nil { return err }
-	defer dir.Close()
-	return dir.Sync()
+	if err := writeAtomicPrivate(a.usersPath(), data); err != nil {
+		return err
+	}
+	return syncVaultDirectory(a.storageRoot)
 }
 
 func (a *App) loadCompaniesUnlocked() ([]CompanyProfile, error) {
@@ -1420,7 +1431,7 @@ func (a *App) GetFirmCalendar2026() ([]FirmCalendarAssignment, error) {
 }
 
 func (a *App) AssignClientToFirmCalendar2026(date, clientPath string) ([]FirmCalendarAssignment, error) {
- return a.AssignClientToFirmCalendarForPreparer2026(date, clientPath, "")
+	return a.AssignClientToFirmCalendarForPreparer2026(date, clientPath, "")
 }
 
 func (a *App) AssignClientToFirmCalendarForPreparer2026(date, clientPath, preparerUsername string) ([]FirmCalendarAssignment, error) {
@@ -1439,8 +1450,10 @@ func (a *App) AssignClientToFirmCalendarForPreparer2026(date, clientPath, prepar
 		return nil, err
 	}
 
- preparerUsername, err = a.validateCalendarPreparer(preparerUsername)
- if err != nil { return nil, err }
+	preparerUsername, err = a.validateCalendarPreparer(preparerUsername)
+	if err != nil {
+		return nil, err
+	}
 
 	a.calendarMu.Lock()
 	defer a.calendarMu.Unlock()
@@ -1454,11 +1467,11 @@ func (a *App) AssignClientToFirmCalendarForPreparer2026(date, clientPath, prepar
 		}
 	}
 	stored = append(stored, storedFirmCalendarAssignment{
-		Date:       date,
-		ClientID:   props.ClientID,
-		ClientName: props.Name,
-		ReturnType: props.ReturnType,
-        PreparerUsername: preparerUsername,
+		Date:             date,
+		ClientID:         props.ClientID,
+		ClientName:       props.Name,
+		ReturnType:       props.ReturnType,
+		PreparerUsername: preparerUsername,
 	})
 	if err := a.saveFirmCalendarUnlocked(stored); err != nil {
 		return nil, err
@@ -2526,8 +2539,10 @@ func (a *App) GetNotesDocument(path string) (NotesDocument, error) {
 	if err == nil {
 		if hb, readErr := a.secureReadFile(rp); readErr == nil {
 			clean, sanitizeErr := sanitizeNotesHTML(string(hb))
-            if sanitizeErr != nil { return NotesDocument{}, sanitizeErr }
-            doc.HTML = clean
+			if sanitizeErr != nil {
+				return NotesDocument{}, sanitizeErr
+			}
+			doc.HTML = clean
 		}
 	}
 	return doc, nil
@@ -2546,8 +2561,10 @@ func (a *App) SaveNotes(path, text string) error {
 }
 
 func (a *App) SaveNotesDocument(path, htmlContent, text string) error {
-    cleanHTML, err := sanitizeNotesHTML(htmlContent)
-    if err != nil { return err }
+	cleanHTML, err := sanitizeNotesHTML(htmlContent)
+	if err != nil {
+		return err
+	}
 	np, err := a.notesPathFor(path)
 	if err != nil {
 		return err
