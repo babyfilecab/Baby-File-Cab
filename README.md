@@ -123,9 +123,9 @@ go test ./...
 wails dev -tags webkit2_41
 ```
 
-# BabyFileCab — Wails User Manual & Keybindings
+# BabyFileCab — User Manual & Keybindings
 
-This build continues the local-first Go + Wails BabyFileCab codebase with company users, grouped actions, client communications search, return-type display, light/dark themes, and the Edit Client context-menu workflow.
+This build continues the local-first BabyFileCab with company users, grouped actions, client communications search, return-type display, light/dark themes, and the Edit Client context-menu workflow.
 
 ## User Manual
 
@@ -195,23 +195,6 @@ Company workspaces are stored under:
 `~/BabyFileCabData/companies/<company-id>/`
 
 The account index is stored in `~/BabyFileCabData/.accounts.sqlite` after migration. Each company keeps sensitive profiles, descriptions, and calendar entries as encrypted records in `.vault.sqlite`. Password verifiers use Argon2id for new accounts; old PBKDF2 verifiers are upgraded after successful sign-in. Wrapped vault keys live separately in `~/BabyFileCabData/.vault-keys/`.
-
-## Run on Parrot OS
-
-Extract the ZIP under `~/Desktop/neovim`, then run:
-
-```bash
-cd ~/Desktop/neovim/BabyFileCab-Wails-CREATE-INVOICE
-go mod tidy
-wails dev -tags webkit2_41
-```
-
-For later runs:
-
-```bash
-cd ~/Desktop/neovim/BabyFileCab-Wails-CREATE-INVOICE
-wails dev -tags webkit2_41
-```
 
 ## Local-first limitation
 
