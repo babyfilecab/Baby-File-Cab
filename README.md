@@ -1,4 +1,12 @@
-## Signature and e-file calendar statuses
+## What is babyfilecab? 
+
+BabyFileCab is a digital filing cabinet and workflow tool built specifically for tax and accounting practices.
+
+BabyFileCab is a local-first desktop document management system designed specifically for tax and accounting professionals. It gives tax preparers, Enrolled Agents, CPAs, bookkeepers, and small accounting firms a structured digital filing cabinet for organizing client records by client, tax year, section, and permanent folder. Instead of keeping tax documents scattered across Windows folders, email downloads, spreadsheets, and PDFs, BabyFileCab brings them into one organized workspace.
+
+BabyFileCab can be used to manage and preview documents, search across client files, maintain client notes, track activity, and organize workflow. It also includes accounting-practice tools such as a firm calendar, federal tax calculator, engagement letter generator, invoice generator, IRS yearly-average currency converter, and audit trail. A major part of the design is that it is local-first. Client documents are stored on the user's own computer rather than requiring them to be uploaded to BabyFileCab-operated cloud storage. Its security architecture includes features such as AES-256-GCM encryption, company-specific vault keys, Argon2id password protection, encrypted backups, automatic locking, and protected audit history.
+
+Its goal is to combine document organization, client management, security, and everyday tax-office tools in one easy-to-use desktop application.
 
 **8879 Sent**, **Waiting for Signature**, **Signed** and **Ready to E-file** are available both by right-clicking a scheduled client and in the search panel's Change Assignment dropdown. The chosen label appears beside the client's name in the weekly calendar and in the scheduled-date selector. These are manually selected workflow labels; choosing them does not send a form, collect a signature or file a return. Each scheduled entry has one status, so selecting a new status replaces the previous one. Clear Status removes it. The statuses persist in encrypted company calendar metadata.
 
